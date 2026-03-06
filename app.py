@@ -397,12 +397,12 @@ def plot_bpm_stability(result: dict) -> go.Figure:
     fig = go.Figure()
     fig.add_hrect(y0=mean_bpm - mean_bpm * 0.015,
                   y1=mean_bpm + mean_bpm * 0.015,
-                  fillcolor='#c8ff0015', line_width=0, annotation_text="±1.5% threshold")
+                  fillcolor='rgba(200,255,0,0.08)', line_width=0, annotation_text="±1.5% threshold")
     fig.add_trace(go.Scatter(
         x=x, y=bpm_time, mode='lines',
         line=dict(color='#c8ff00', width=2),
         name='BPM over time',
-        fill='tozeroy', fillcolor='#c8ff0008'
+        fill='tozeroy', fillcolor='rgba(200,255,0,0.03)'
     ))
     fig.add_hline(y=mean_bpm, line_dash='dash', line_color='#666', line_width=1)
     fig.update_layout(**PLOT_LAYOUT, title="BPM Stability Over Time",
@@ -418,13 +418,13 @@ def plot_spectral_density(result: dict) -> go.Figure:
     
     fig = make_subplots(rows=2, cols=1, shared_xaxes=True, vertical_spacing=0.08)
     
-    fig.add_hrect(y0=0.30, y1=0.45, fillcolor='#c8ff0015', line_width=0, row=1, col=1)
+    fig.add_hrect(y0=0.30, y1=0.45, fillcolor='rgba(200,255,0,0.08)', line_width=0, row=1, col=1)
     fig.add_trace(go.Scatter(x=x, y=density, mode='lines', line=dict(color='#c8ff00', width=2),
-                              name='Density', fill='tozeroy', fillcolor='#c8ff0008'), row=1, col=1)
+                              name='Density', fill='tozeroy', fillcolor='rgba(200,255,0,0.03)'), row=1, col=1)
     
-    fig.add_hrect(y0=250, y1=400, fillcolor='#ff6b0015', line_width=0, row=2, col=1)
+    fig.add_hrect(y0=250, y1=400, fillcolor='rgba(255,107,0,0.08)', line_width=0, row=2, col=1)
     fig.add_trace(go.Scatter(x=x, y=centroid, mode='lines', line=dict(color='#ff6b00', width=2),
-                              name='Centroid (Hz)', fill='tozeroy', fillcolor='#ff6b0008'), row=2, col=1)
+                              name='Centroid (Hz)', fill='tozeroy', fillcolor='rgba(255,107,0,0.03)'), row=2, col=1)
     
     fig.update_layout(**PLOT_LAYOUT, title="Spectral Features Over Time",
                       height=400, showlegend=True)
@@ -440,12 +440,12 @@ def plot_sub_bass(result: dict) -> go.Figure:
     x = np.linspace(0, result["metadata"]["duration_min"], n)
     
     fig = go.Figure()
-    fig.add_hrect(y0=0.90, y1=1.01, fillcolor='#00e5a015', line_width=0, annotation_text="≥90% target")
+    fig.add_hrect(y0=0.90, y1=1.01, fillcolor='rgba(0,229,160,0.08)', line_width=0, annotation_text="≥90% target")
     fig.add_trace(go.Scatter(x=x, y=sub, mode='lines+markers',
                               line=dict(color='#00e5a0', width=2),
                               marker=dict(size=3, color='#00e5a0'),
                               name='Sub-bass presence',
-                              fill='tozeroy', fillcolor='#00e5a008'))
+                              fill='tozeroy', fillcolor='rgba(0,229,160,0.03)'))
     fig.update_layout(**PLOT_LAYOUT, title="Sub-Bass (<80Hz) Continuity",
                       xaxis_title="Time (min)", yaxis_title="Presence",
                       yaxis=dict(range=[0, 1.05], gridcolor='#222'))
@@ -547,8 +547,30 @@ with st.sidebar:
                                   label_visibility="collapsed")
     
     st.markdown('<div class="section-header">Export</div>', unsafe_allow_html=True)
-    export_format = st.selectbox("Format", ["JSON", "CSV", "LaTeX"], label_visibility="collapsed")
+    export_format = st.selectbox("Format", ["JSON", "CSV", "LaTeX", "PDF Report"], label_visibility="collapsed")
     
+
+    st.markdown('<div class="section-header">Session History</div>', unsafe_allow_html=True)
+    if "analysis_history" not in st.session_state:
+        st.session_state.analysis_history = {}
+    history = st.session_state.analysis_history
+    if history:
+        for fname, rec in list(history.items())[-5:]:
+            icon = "✅" if rec["compliant"] else "❌"
+            short = fname[:22] + "…" if len(fname) > 22 else fname
+            st.markdown(
+                f'<div style="font-size:0.72rem;color:#666;padding:0.2rem 0;border-bottom:1px solid #1a1a1a">' +
+                f'{icon} <span style="color:#aaa">{short}</span><br>' +
+                f'<span style="font-family:Space Mono;font-size:0.65rem;color:#555">' +
+                f'{rec["bpm"]:.1f} BPM · {rec["principles"]}/5 · {rec["date"]}</span></div>',
+                unsafe_allow_html=True
+            )
+        if st.button("🗑 Clear History", use_container_width=True):
+            st.session_state.analysis_history = {}
+            st.rerun()
+    else:
+        st.markdown('<div style="font-size:0.72rem;color:#444">No analyses this session yet.</div>', unsafe_allow_html=True)
+
     st.markdown("---")
     st.markdown('<div style="font-size:0.65rem;color:#444;font-family:Space Mono;line-height:1.6">'
                 'Protocol: 5 core principles<br>'
@@ -612,6 +634,18 @@ audio_bytes = uploaded.read()
 with st.spinner("Analyzing track..."):
     result = try_real_analysis(audio_bytes, uploaded.name)
     time.sleep(0.5)  # UX pause
+
+# Save to session history
+if "analysis_history" not in st.session_state:
+    st.session_state.analysis_history = {}
+from datetime import datetime
+st.session_state.analysis_history[uploaded.name] = {
+    "bpm": result["tempo"]["bpm"],
+    "principles": result["protocol_compliance"]["principles_passed"],
+    "compliant": result["protocol_compliance"]["compliant"],
+    "date": datetime.now().strftime("%m/%d %H:%M"),
+    "result": result,
+}
 
 real = result["metadata"].get("real_analysis", False)
 if not real:
@@ -874,6 +908,75 @@ with tab5:
                 mime="application/json"
             )
             st.code(json_str[:800] + "\n...", language="json")
+        
+        elif export_format == "PDF Report":
+            # Build a clean HTML report then offer download as HTML (print-to-PDF)
+            t_v = result["tempo"]
+            s_v = result["spectral"]
+            l_v = result["lowend"]
+            p_v = result["protocol_compliance"]
+            comp = result["protocol_compliance"]["compliant"]
+            color = "#00c77a" if comp else "#e53535"
+            status = "COMPLIANT" if comp else "NON-COMPLIANT"
+            
+            rows_html = ""
+            for code, p in p_v["principles"].items():
+                ok = p["compliant"]
+                rows_html += f"""<tr>
+                    <td><b>{code}</b></td>
+                    <td>{p['name']}</td>
+                    <td style="color:{'#00c77a' if ok else '#e53535'};font-weight:700">{'PASS' if ok else 'FAIL'}</td>
+                    <td style="color:#666">{p['details']}</td>
+                </tr>"""
+            
+            html_report = f"""<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  body {{ font-family: monospace; background: #fff; color: #111; padding: 3rem; max-width: 900px; margin: 0 auto; }}
+  h1 {{ font-size: 1.6rem; border-bottom: 3px solid #000; padding-bottom: 0.5rem; }}
+  .status {{ display: inline-block; padding: 0.4rem 1rem; background: {color}; color: #fff; font-weight: 700; font-size: 1.1rem; margin: 1rem 0; }}
+  table {{ width: 100%; border-collapse: collapse; margin: 1.5rem 0; }}
+  th {{ background: #111; color: #fff; padding: 0.5rem; text-align: left; }}
+  td {{ padding: 0.45rem; border-bottom: 1px solid #eee; font-size: 0.9rem; }}
+  .grid {{ display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 1rem 0; }}
+  .card {{ border: 1px solid #ddd; padding: 1rem; }}
+  .val {{ font-size: 1.5rem; font-weight: 700; }}
+  .lbl {{ font-size: 0.7rem; color: #888; text-transform: uppercase; letter-spacing: 0.1em; margin-top: 0.2rem; }}
+  @media print {{ body {{ padding: 1rem; }} }}
+</style>
+</head><body>
+<h1>⬛ Continuous Inertia Techno Analyzer</h1>
+<p style="color:#888;font-size:0.85rem">Track: <b>{result['metadata']['filename']}</b> · Duration: {result['metadata']['duration_min']:.1f} min · Analyzer v{result['metadata']['analyzer_version']}</p>
+<div class="status">{status} — {p_v['principles_passed']}/5 PRINCIPLES</div>
+
+<div class="grid">
+  <div class="card"><div class="val">{t_v['bpm']:.1f}</div><div class="lbl">BPM</div></div>
+  <div class="card"><div class="val" style="color:{'#00c77a' if t_v['bpm_variance_pct']<1.5 else '#e53535'}">{t_v['bpm_variance_pct']:.2f}%</div><div class="lbl">BPM Variance</div></div>
+  <div class="card"><div class="val" style="color:{'#00c77a' if 0.30<=s_v['density']['mean']<=0.45 else '#e53535'}">{s_v['density']['mean']:.3f}</div><div class="lbl">Spectral Density</div></div>
+  <div class="card"><div class="val">{s_v['centroid']['mean']:.0f} Hz</div><div class="lbl">Centroid</div></div>
+  <div class="card"><div class="val" style="color:{'#00c77a' if l_v['sub_presence_pct']>=0.90 else '#e53535'}">{l_v['sub_presence_pct']*100:.0f}%</div><div class="lbl">Sub-Bass</div></div>
+  <div class="card"><div class="val">{result['structure']['layers_mean']:.1f}</div><div class="lbl">Mean Layers</div></div>
+</div>
+
+<h2>Protocol Compliance</h2>
+<table>
+  <tr><th>Code</th><th>Principle</th><th>Result</th><th>Details</th></tr>
+  {rows_html}
+</table>
+
+<p style="font-size:0.7rem;color:#aaa;margin-top:3rem;border-top:1px solid #eee;padding-top:1rem">
+Generated by Continuous Inertia Techno Analyzer v2.0 · Use browser Print → Save as PDF
+</p>
+</body></html>"""
+            
+            st.download_button(
+                "⬇ Download HTML Report (→ Print as PDF)",
+                data=html_report,
+                file_name=f"report_{Path(uploaded.name).stem}.html",
+                mime="text/html"
+            )
+            st.info("💡 Open the downloaded HTML in your browser and use **File → Print → Save as PDF** to get a clean PDF report.")
+            st.components.v1.html(html_report, height=600, scrolling=True)
         
         elif export_format == "CSV":
             flat = {
