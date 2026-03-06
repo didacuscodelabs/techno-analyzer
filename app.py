@@ -1092,11 +1092,11 @@ def plot_elements_heatmap(result: dict) -> go.Figure:
     fig.update_layout(
         **PLOT_BASE,
         title='Element / Layer Presence Timeline',
-        xaxis=dict(title='Time (min)', gridcolor='#2a2520'),
-        yaxis=dict(gridcolor='#2a2520', tickfont=dict(size=10)),
         height=340,
         margin=dict(l=130, r=60, t=45, b=40),
     )
+    fig.update_xaxes(title_text='Time (min)', gridcolor='#2a2520', zerolinecolor='#2a2520')
+    fig.update_yaxes(gridcolor='#2a2520', zerolinecolor='#2a2520', tickfont=dict(size=10))
     return fig
 
 
@@ -1371,7 +1371,7 @@ audio_bytes = uploaded.read()
 
 col_btn1, col_btn2, col_btn3 = st.columns([1, 2, 1])
 with col_btn2:
-    analyze_clicked = st.button("◆  Analyze Track", use_container_width=True)
+    analyze_clicked = st.button("◆  Analyze Track", width='stretch')
 
 if analyze_clicked or (st.session_state.analyzed_name == uploaded.name and st.session_state.result):
     if analyze_clicked or st.session_state.result is None:
@@ -1466,7 +1466,7 @@ st.markdown("&nbsp;", unsafe_allow_html=True)
 
 # ── MASTER WAVEFORM (always visible, above tabs)
 st.markdown('<div class="section-header">Master Analysis — Full Track View</div>', unsafe_allow_html=True)
-st.plotly_chart(plot_master_waveform(result), use_container_width=True)
+st.plotly_chart(plot_master_waveform(result), width='stretch')
 
 tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
     "Protocol", "Spectral", "Structure",
@@ -1526,7 +1526,7 @@ with tab1:
             </div>""", unsafe_allow_html=True)
 
     with colb:
-        st.plotly_chart(plot_compliance_radar(result), use_container_width=True)
+        st.plotly_chart(plot_compliance_radar(result), width='stretch')
         st.markdown('<div class="section-header">Summary</div>', unsafe_allow_html=True)
         if compliant:
             st.success(f"✅ **{passed}/5 core principles met.** Track qualifies as Continuous Inertia Techno under protocol v2.1.")
@@ -1540,7 +1540,7 @@ with tab1:
 # ── TAB 2: SPECTRAL
 with tab2:
     if show_timeseries:
-        st.plotly_chart(plot_spectral_density(result), use_container_width=True)
+        st.plotly_chart(plot_spectral_density(result), width='stretch')
 
     col_s1, col_s2, col_s3 = st.columns(3)
     with col_s1:
@@ -1567,7 +1567,7 @@ with tab2:
     with col_k2: st.markdown(metric_html("Kick Consistency", f"{k_r['kick_consistency']*100:.0f}",  "%", k_r['kick_consistency'] >= 0.80), unsafe_allow_html=True)
     with col_k3: st.markdown(metric_html("Kick Fundamental", f"{k_r['kick_fundamental_hz']:.0f}",  "Hz", True), unsafe_allow_html=True)
 
-    st.plotly_chart(plot_bpm_stability(result), use_container_width=True)
+    st.plotly_chart(plot_bpm_stability(result), width='stretch')
 
 
 # ── TAB 3: STRUCTURE
@@ -1587,7 +1587,7 @@ with tab3:
 
     with col_st2:
         st.markdown('<div class="section-header">Sub-Bass Continuity</div>', unsafe_allow_html=True)
-        st.plotly_chart(plot_sub_bass(result), use_container_width=True)
+        st.plotly_chart(plot_sub_bass(result), width='stretch')
 
     col_lb1, col_lb2, col_lb3 = st.columns(3)
     with col_lb1: st.markdown(metric_html("Sub Presence",  f"{l_r['sub_presence_pct']*100:.0f}", "%", l_r['sub_presence_pct'] >= 0.90), unsafe_allow_html=True)
@@ -1598,7 +1598,7 @@ with tab3:
 # ── TAB 4: TRACK MAP  ── NEW
 with tab4:
     st.markdown('<div class="section-header">Full Track Energy Map</div>', unsafe_allow_html=True)
-    st.plotly_chart(plot_track_map(result), use_container_width=True)
+    st.plotly_chart(plot_track_map(result), width='stretch')
 
     # Section table
     st.markdown('<div class="section-header">Section Breakdown</div>', unsafe_allow_html=True)
@@ -1623,7 +1623,7 @@ with tab4:
 
     # Element heatmap
     st.markdown('<div class="section-header">Element / Layer Presence</div>', unsafe_allow_html=True)
-    st.plotly_chart(plot_elements_heatmap(result), use_container_width=True)
+    st.plotly_chart(plot_elements_heatmap(result), width='stretch')
 
     # Element summary cards
     st.markdown('<div class="section-header">Detected Elements</div>', unsafe_allow_html=True)
@@ -1688,7 +1688,7 @@ with tab5:
 
         # Chord timeline
         st.markdown('<div class="section-header" style="margin-top:1.5rem">Harmonic Timeline</div>', unsafe_allow_html=True)
-        st.plotly_chart(plot_chord_timeline(result), use_container_width=True)
+        st.plotly_chart(plot_chord_timeline(result), width='stretch')
 
         # Mode info
         mode_info = {
@@ -1706,7 +1706,7 @@ with tab5:
         </div>""", unsafe_allow_html=True)
 
     with col_t2:
-        st.plotly_chart(plot_key_circle(result), use_container_width=True)
+        st.plotly_chart(plot_key_circle(result), width='stretch')
 
         st.markdown('<div class="section-header">Key Summary</div>', unsafe_allow_html=True)
         st.markdown(f"""
@@ -1736,7 +1736,7 @@ with tab6:
     if not check_corpus:
         st.info("Enable **Corpus Comparison** in the sidebar to see this analysis.")
     else:
-        st.plotly_chart(plot_corpus_scatter(result), use_container_width=True)
+        st.plotly_chart(plot_corpus_scatter(result), width='stretch')
 
         st.markdown('<div class="section-header">Percentile Position vs. Corpus (n=30)</div>', unsafe_allow_html=True)
 
@@ -1830,42 +1830,47 @@ with tab7:
                 file_name=f"analysis_{Path(uploaded.name).stem}.csv",
                 mime="text/csv",
             )
-            st.dataframe(df.T.rename(columns={0: "Value"}), use_container_width=True)
+            st.dataframe(df.T.rename(columns={0: "Value"}), width='stretch')
 
         elif export_format == "LaTeX":
-            t_val = result["tempo"]
-            s_val = result["spectral"]
-            l_val = result["lowend"]
-            p_val = result["protocol_compliance"]
+            t_val  = result["tempo"]
+            s_val  = result["spectral"]
+            l_val  = result["lowend"]
+            p_val  = result["protocol_compliance"]
             tn_val = result["tonality"]
+            stem   = Path(uploaded.name).stem
 
-            latex = f"""% Auto-generated by Continuous Inertia Analyzer v2.1
-\\begin{{table}}[h]
-\\centering
-\\caption{{Acoustic Analysis: {Path(uploaded.name).stem}}}
-\\begin{{tabular}}{{lcc}}
-\\hline
-\\textbf{{Parameter}} & \\textbf{{Value}} & \\textbf{{Compliant}} \\\\
-\\hline
-BPM & {t_val['bpm']:.1f} & {'\\checkmark' if 128 <= t_val['bpm'] <= 135 else '$\\times$'} \\\\
-BPM Variance (\\%) & {t_val['bpm_variance_pct']:.2f} & {'\\checkmark' if t_val['bpm_variance_pct'] < 1.5 else '$\\times$'} \\\\
-Spectral Density & {s_val['density']['mean']:.3f} & {'\\checkmark' if 0.30 <= s_val['density']['mean'] <= 0.45 else '$\\times$'} \\\\
-Centroid (Hz) & {s_val['centroid']['mean']:.0f} & {'\\checkmark' if 250 <= s_val['centroid']['mean'] <= 400 else '$\\times$'} \\\\
-Sub-Bass (\\%) & {l_val['sub_presence_pct']*100:.0f} & {'\\checkmark' if l_val['sub_presence_pct'] >= 0.90 else '$\\times$'} \\\\
-Key & {tn_val['key_string'].upper()} & -- \\\\
-\\hline
-Principles Passed & {p_val['principles_passed']}/5 & {'\\checkmark' if p_val['compliant'] else '$\\times$'} \\\\
-\\hline
-\\end{{tabular}}
-\\end{{table}}"""
+            def chk(cond): return r"\checkmark" if cond else r"$\times$"
+
+            latex_lines = [
+                r"% Auto-generated by Continuous Inertia Analyzer v2.1",
+                r"\begin{table}[h]",
+                r"\centering",
+                "\\caption{Acoustic Analysis: " + stem + "}",
+                r"\begin{tabular}{lcc}",
+                r"\hline",
+                r"\textbf{Parameter} & \textbf{Value} & \textbf{Compliant} \\",
+                r"\hline",
+                f"BPM & {t_val['bpm']:.1f} & {chk(128 <= t_val['bpm'] <= 135)} \\\\",
+                f"BPM Variance (%) & {t_val['bpm_variance_pct']:.2f} & {chk(t_val['bpm_variance_pct'] < 1.5)} \\\\",
+                f"Spectral Density & {s_val['density']['mean']:.3f} & {chk(0.30 <= s_val['density']['mean'] <= 0.45)} \\\\",
+                f"Centroid (Hz) & {s_val['centroid']['mean']:.0f} & {chk(250 <= s_val['centroid']['mean'] <= 400)} \\\\",
+                f"Sub-Bass (%) & {l_val['sub_presence_pct']*100:.0f} & {chk(l_val['sub_presence_pct'] >= 0.90)} \\\\",
+                f"Key & {tn_val['key_string'].upper()} & -- \\\\",
+                r"\hline",
+                f"Principles Passed & {p_val['principles_passed']}/5 & {chk(p_val['compliant'])} \\\\",
+                r"\hline",
+                r"\end{tabular}",
+                r"\end{table}",
+            ]
+            latex = "\n".join(latex_lines)
             st.download_button(
                 "⬇ Download LaTeX",
                 data=latex,
-                file_name=f"table_{Path(uploaded.name).stem}.tex",
+                file_name=f"table_{stem}.tex",
                 mime="text/plain",
             )
             st.code(latex, language="latex")
-
         elif export_format == "HTML Report (→ PDF)":
             interp = generate_interpretation(result)
             tv, sv, lv, pv, tnv = (result["tempo"], result["spectral"],
