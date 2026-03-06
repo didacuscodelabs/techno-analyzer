@@ -798,11 +798,23 @@ def plot_spectral_density(result: dict) -> go.Figure:
     x = np.linspace(0, result["metadata"]["duration_min"], n)
 
     fig = make_subplots(rows=2, cols=1, shared_xaxes=True, vertical_spacing=0.08)
-    fig.add_hrect(y0=0.30, y1=0.45, fillcolor='rgba(200,255,0,0.07)', line_width=0, row=1, col=1)
+
+    # NOTE: add_hrect with row/col is broken in Plotly 6.
+    # Use update_layout shapes with yref='y' (row1) and yref='y2' (row2) instead.
+    fig.update_layout(
+        shapes=[
+            dict(type='rect', xref='paper', yref='y',
+                 x0=0, x1=1, y0=0.30, y1=0.45,
+                 fillcolor='rgba(200,255,0,0.07)', line_width=0, layer='below'),
+            dict(type='rect', xref='paper', yref='y2',
+                 x0=0, x1=1, y0=250, y1=400,
+                 fillcolor='rgba(255,107,0,0.07)', line_width=0, layer='below'),
+        ]
+    )
+
     fig.add_trace(go.Scatter(x=x, y=density, mode='lines',
                               line=dict(color='#c8ff00', width=2),
                               name='Density', fill='tozeroy', fillcolor='rgba(200,255,0,0.05)'), row=1, col=1)
-    fig.add_hrect(y0=250, y1=400, fillcolor='rgba(255,107,0,0.07)', line_width=0, row=2, col=1)
     fig.add_trace(go.Scatter(x=x, y=centroid, mode='lines',
                               line=dict(color='#ff6b00', width=2),
                               name='Centroid (Hz)', fill='tozeroy', fillcolor='rgba(255,107,0,0.05)'), row=2, col=1)
