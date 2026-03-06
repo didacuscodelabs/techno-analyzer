@@ -36,174 +36,259 @@ st.set_page_config(
 # ──────────────────────────────────────────────
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=DM+Mono:wght@300;400&display=swap');
 
 :root {
-    --bg: #0a0a0a;
-    --surface: #111111;
-    --surface2: #1a1a1a;
-    --border: #2a2a2a;
-    --accent: #c8ff00;
-    --accent2: #ff6b00;
-    --text: #e8e8e0;
-    --muted: #666660;
-    --danger: #ff3b3b;
-    --success: #00e5a0;
+    --bg:      #0f0e0d;
+    --s1:      #161412;
+    --s2:      #1d1a17;
+    --border:  #2a2520;
+    --border2: #3a3028;
+    --gold:    #c9a96e;
+    --gold2:   #e8d5b0;
+    --rose:    #c49a8a;
+    --sage:    #8aad9a;
+    --slate:   #8a9aad;
+    --text:    #e0d8ce;
+    --muted:   #7a6e62;
+    --dim:     #4a4038;
+    --pass:    #8aad9a;
+    --fail:    #c47a7a;
+    --warn:    #c9a96e;
 }
 
-html, body, [data-testid="stAppViewContainer"] {
-    background-color: var(--bg) !important;
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body,
+[data-testid="stAppViewContainer"],
+[data-testid="stApp"] {
+    background: var(--bg) !important;
     color: var(--text) !important;
-    font-family: 'DM Sans', sans-serif !important;
+    font-family: 'DM Mono', monospace !important;
 }
 
 [data-testid="stSidebar"] {
-    background-color: var(--surface) !important;
+    background: var(--s1) !important;
     border-right: 1px solid var(--border) !important;
 }
+[data-testid="stSidebar"] > div:first-child { padding-top: 2rem !important; }
 
-h1, h2, h3 { font-family: 'Space Mono', monospace !important; }
+#MainMenu, footer, header { visibility: hidden !important; }
+[data-testid="stDecoration"], [data-testid="stToolbar"] { display: none !important; }
 
-.stButton > button {
-    background: var(--accent) !important;
-    color: #000 !important;
-    border: none !important;
-    font-family: 'Space Mono', monospace !important;
-    font-weight: 700 !important;
-    letter-spacing: 0.05em !important;
+/* Typography */
+h1 {
+    font-family: 'Cormorant Garamond', serif !important;
+    font-weight: 300 !important;
+    font-size: 2.2rem !important;
+    letter-spacing: 0.06em !important;
+    color: var(--text) !important;
+    line-height: 1.2 !important;
+}
+
+/* Divider */
+hr { border: none !important; border-top: 1px solid var(--border) !important; margin: 1.2rem 0 !important; }
+
+/* Streamlit overrides */
+[data-testid="stFileUploader"] {
+    background: var(--s1) !important;
+    border: 1px dashed var(--border2) !important;
     border-radius: 0 !important;
-    padding: 0.6rem 1.5rem !important;
-    transition: all 0.15s ease !important;
+    transition: border-color 0.2s !important;
+}
+[data-testid="stFileUploader"]:hover { border-color: var(--gold) !important; }
+[data-testid="stFileUploader"] label { color: var(--muted) !important; }
+
+/* Buttons */
+.stButton > button {
+    background: transparent !important;
+    color: var(--gold) !important;
+    border: 1px solid var(--gold) !important;
+    border-radius: 0 !important;
+    font-family: 'DM Mono', monospace !important;
+    font-size: 0.72rem !important;
+    letter-spacing: 0.14em !important;
+    text-transform: uppercase !important;
+    padding: 0.55rem 1.8rem !important;
+    transition: all 0.18s !important;
 }
 .stButton > button:hover {
-    background: #e0ff40 !important;
-    transform: translateY(-1px) !important;
+    background: var(--gold) !important;
+    color: #000 !important;
 }
+.stButton > button:active {
+    background: var(--gold2) !important;
+    transform: translateY(1px) !important;
+}
+
+/* Tabs */
+.stTabs [data-baseweb="tab-list"] {
+    background: transparent !important;
+    border-bottom: 1px solid var(--border) !important;
+    gap: 0 !important;
+    padding: 0 !important;
+}
+.stTabs [data-baseweb="tab"] {
+    font-family: 'DM Mono', monospace !important;
+    font-size: 0.62rem !important;
+    letter-spacing: 0.14em !important;
+    text-transform: uppercase !important;
+    color: var(--muted) !important;
+    border-radius: 0 !important;
+    padding: 0.65rem 1.3rem !important;
+    background: transparent !important;
+}
+.stTabs [aria-selected="true"] {
+    color: var(--gold) !important;
+    border-bottom: 1px solid var(--gold) !important;
+    background: transparent !important;
+}
+
+/* Selectbox / toggle */
+[data-testid="stSelectbox"] > div > div {
+    background: var(--s2) !important;
+    border: 1px solid var(--border2) !important;
+    border-radius: 0 !important;
+    font-family: 'DM Mono', monospace !important;
+    font-size: 0.75rem !important;
+    color: var(--text) !important;
+}
+[data-testid="stToggle"] label,
+[data-testid="stSelectbox"] label {
+    font-family: 'DM Mono', monospace !important;
+    font-size: 0.62rem !important;
+    letter-spacing: 0.12em !important;
+    text-transform: uppercase !important;
+    color: var(--muted) !important;
+}
+
+/* Download buttons */
+[data-testid="stDownloadButton"] > button {
+    background: transparent !important;
+    color: var(--gold) !important;
+    border: 1px solid var(--border2) !important;
+    border-radius: 0 !important;
+    font-family: 'DM Mono', monospace !important;
+    font-size: 0.68rem !important;
+    letter-spacing: 0.1em !important;
+}
+[data-testid="stDownloadButton"] > button:hover { border-color: var(--gold) !important; }
+
+/* Alerts */
+[data-testid="stAlert"] {
+    border-radius: 0 !important;
+    font-family: 'DM Mono', monospace !important;
+    font-size: 0.72rem !important;
+    border-left-width: 2px !important;
+}
+
+/* ─── Custom components ─── */
 
 .metric-card {
-    background: var(--surface);
+    background: var(--s1);
     border: 1px solid var(--border);
-    border-left: 3px solid var(--accent);
-    padding: 1rem 1.2rem;
-    margin: 0.4rem 0;
+    border-left: 2px solid var(--gold);
+    padding: 0.9rem 1.1rem;
+    margin: 0.3rem 0;
+    position: relative;
 }
-.metric-card.fail { border-left-color: var(--danger); }
-.metric-card.warn { border-left-color: var(--accent2); }
+.metric-card.fail { border-left-color: var(--fail); }
+.metric-card.warn { border-left-color: var(--warn); }
+.metric-card.pass { border-left-color: var(--pass); }
 
 .metric-value {
-    font-family: 'Space Mono', monospace;
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: var(--accent);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2rem;
+    font-weight: 300;
+    color: var(--gold2);
     line-height: 1;
 }
-.metric-value.fail { color: var(--danger); }
-.metric-value.warn { color: var(--accent2); }
+.metric-value.fail { color: var(--fail); }
+.metric-value.pass { color: var(--pass); }
 
 .metric-label {
-    font-size: 0.72rem;
-    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.55rem;
     text-transform: uppercase;
-    letter-spacing: 0.12em;
-    margin-top: 0.2rem;
+    letter-spacing: 0.16em;
+    color: var(--muted);
+    margin-top: 0.3rem;
+}
+
+.section-header {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.55rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.35rem;
+    margin: 1.4rem 0 0.9rem 0;
 }
 
 .principle-row {
     display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 0.75rem 1rem;
+    align-items: flex-start;
+    gap: 0.9rem;
+    padding: 0.8rem 0;
     border-bottom: 1px solid var(--border);
-    font-size: 0.9rem;
+    font-size: 0.85rem;
 }
+.principle-row:last-child { border-bottom: none; }
 
 .badge {
-    font-family: 'Space Mono', monospace;
-    font-size: 0.7rem;
-    padding: 0.15rem 0.5rem;
-    border-radius: 2px;
-    font-weight: 700;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.55rem;
+    padding: 0.15rem 0.45rem;
+    letter-spacing: 0.1em;
+    flex-shrink: 0;
+    margin-top: 0.1rem;
 }
-.badge-ok { background: var(--success); color: #000; }
-.badge-fail { background: var(--danger); color: #fff; }
-.badge-warn { background: var(--accent2); color: #000; }
+.badge-ok   { border: 1px solid var(--pass); color: var(--pass); background: transparent; }
+.badge-fail { border: 1px solid var(--fail); color: var(--fail); background: transparent; }
+.badge-warn { border: 1px solid var(--warn); color: var(--warn); background: transparent; }
 
-.section-header {
-    font-family: 'Space Mono', monospace;
-    font-size: 0.7rem;
-    text-transform: uppercase;
-    letter-spacing: 0.15em;
-    color: var(--muted);
-    border-bottom: 1px solid var(--border);
-    padding-bottom: 0.4rem;
-    margin: 1.5rem 0 1rem 0;
+.banner {
+    padding: 1.1rem 1.6rem;
+    border: 1px solid var(--border2);
+    border-left: 3px solid var(--gold);
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.banner.ok { border-left-color: var(--pass); }
+.banner.no { border-left-color: var(--fail); }
+
+.hero-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    font-size: 1.2rem;
+    letter-spacing: 0.12em;
+    color: var(--text);
 }
 
 .tag {
     display: inline-block;
-    font-family: 'Space Mono', monospace;
-    font-size: 0.65rem;
-    padding: 0.1rem 0.45rem;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    color: var(--muted);
-    margin: 0.1rem;
-}
-
-.compliance-score {
-    font-family: 'Space Mono', monospace;
-    font-size: 3.5rem;
-    font-weight: 700;
-    text-align: center;
-    line-height: 1;
-}
-
-.hero-title {
-    font-family: 'Space Mono', monospace;
-    font-size: 1.1rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.55rem;
     letter-spacing: 0.15em;
-    color: var(--accent);
-    text-transform: uppercase;
-}
-
-.stFileUploader { border: 1px dashed var(--border) !important; }
-
-[data-testid="stMetric"] {
-    background: var(--surface) !important;
-    border: 1px solid var(--border) !important;
-    padding: 0.8rem !important;
-}
-
-.stTabs [data-baseweb="tab-list"] {
-    gap: 0;
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-}
-.stTabs [data-baseweb="tab"] {
-    font-family: 'Space Mono', monospace;
-    font-size: 0.75rem;
-    letter-spacing: 0.08em;
-    padding: 0.6rem 1.2rem;
+    padding: 0.1rem 0.4rem;
+    background: var(--s2);
+    border: 1px solid var(--border2);
     color: var(--muted);
-    border-radius: 0 !important;
-}
-.stTabs [aria-selected="true"] {
-    color: var(--accent) !important;
-    border-bottom: 2px solid var(--accent) !important;
-    background: transparent !important;
 }
 
 .chord-pill {
     display: inline-block;
-    font-family: 'Space Mono', monospace;
-    font-size: 1rem;
-    font-weight: 700;
-    padding: 0.5rem 1rem;
-    background: #1a1a1a;
-    border: 1px solid #333;
-    color: #c8ff00;
-    margin: 0.3rem;
-    min-width: 3.5rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.9rem;
+    padding: 0.4rem 0.8rem;
+    background: var(--s2);
+    border: 1px solid var(--border2);
+    color: var(--gold);
+    margin: 0.2rem;
+    min-width: 3rem;
     text-align: center;
 }
 
@@ -212,37 +297,52 @@ h1, h2, h3 { font-family: 'Space Mono', monospace !important; }
     align-items: center;
     gap: 0.8rem;
     padding: 0.4rem 0;
-    border-bottom: 1px solid #1a1a1a;
-    font-size: 0.85rem;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.8rem;
 }
 
 .key-display {
-    font-family: 'Space Mono', monospace;
-    font-size: 3rem;
-    font-weight: 700;
-    color: #c8ff00;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.8rem;
+    font-weight: 300;
+    color: var(--gold);
     line-height: 1;
 }
 
 .interp-box {
-    background: #111;
-    border: 1px solid #2a2a2a;
-    border-left: 3px solid #c8ff00;
-    padding: 1.5rem;
-    font-size: 0.9rem;
-    line-height: 1.8;
-    color: #ccc;
+    background: var(--s1);
+    border: 1px solid var(--border);
+    border-left: 2px solid var(--gold);
+    padding: 1.4rem;
+    font-size: 0.82rem;
+    line-height: 1.9;
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
 }
 
 .section-chip {
     display: inline-block;
-    font-family: 'Space Mono', monospace;
-    font-size: 0.6rem;
-    padding: 0.15rem 0.5rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.55rem;
+    padding: 0.12rem 0.45rem;
     margin: 0.1rem;
-    letter-spacing: 0.05em;
-    border-radius: 2px;
+    letter-spacing: 0.08em;
+    border: 1px solid var(--border2);
 }
+
+.empty-state {
+    text-align: center;
+    padding: 5rem 2rem;
+}
+
+.upload-zone {
+    border: 1px dashed var(--border2);
+    padding: 2.5rem;
+    text-align: center;
+    margin: 1rem 0;
+    transition: border-color 0.2s;
+}
+.upload-zone:hover { border-color: var(--gold); }
 </style>
 """, unsafe_allow_html=True)
 
@@ -262,7 +362,7 @@ SECTION_COLORS = {
     'OUTRO':     'rgba(80,80,80,0.18)',
 }
 SECTION_TEXT_COLORS = {
-    'INTRO': '#888', 'BUILD': '#ff6b00', 'PEAK': '#c8ff00',
+    'INTRO': '#888', 'BUILD': '#ff6b00', 'PEAK': '#c9a96e',
     'GROOVE': '#00e5a0', 'BREAKDOWN': '#4488ff', 'OUTRO': '#666',
 }
 
@@ -307,7 +407,7 @@ MODE_COLORS = {
     'minor': '#4488ff',
     'dorian': '#00e5a0',
     'phrygian': '#ff3b3b',
-    'mixolydian': '#c8ff00',
+    'mixolydian': '#c9a96e',
     'major': '#ff6b00',
 }
 
@@ -368,7 +468,7 @@ def simulate_track_structure(duration_sec, bpm):
     # ── Element timelines
     # presence per section: [INTRO, BUILD, PEAK, GROOVE, BREAKDOWN, BUILD2, PEAK2, OUTRO]
     el_defs = {
-        'Kick':     {'label': '4/4 Kick Drum',      'color': '#c8ff00',
+        'Kick':     {'label': '4/4 Kick Drum',      'color': '#c9a96e',
                      'pres': [0.30, 0.92, 1.00, 1.00, 0.02, 0.92, 1.00, 0.35]},
         'Sub Bass': {'label': 'Sub Bass (<80 Hz)',   'color': '#ff6b00',
                      'pres': [0.55, 0.82, 0.96, 0.95, 0.65, 0.84, 0.96, 0.50]},
@@ -755,12 +855,18 @@ This track operates at **{bpm:.1f} BPM** with a {bpm_char} character. Written in
 # ──────────────────────────────────────────────
 
 PLOT_LAYOUT = dict(
-    paper_bgcolor='#0a0a0a',
-    plot_bgcolor='#111111',
-    font=dict(family='Space Mono, monospace', color='#e8e8e0', size=11),
+    paper_bgcolor='#0f0e0d',
+    plot_bgcolor='#161412',
+    font=dict(family='DM Mono, monospace', color='#7a6e62', size=10),
     margin=dict(l=40, r=20, t=40, b=40),
-    xaxis=dict(gridcolor='#1e1e1e', zerolinecolor='#222'),
-    yaxis=dict(gridcolor='#1e1e1e', zerolinecolor='#222'),
+    xaxis=dict(gridcolor='#2a2520', zerolinecolor='#2a2520'),
+    yaxis=dict(gridcolor='#2a2520', zerolinecolor='#2a2520'),
+)
+PLOT_BASE = dict(
+    paper_bgcolor='#0f0e0d',
+    plot_bgcolor='#161412',
+    font=dict(family='DM Mono, monospace', color='#7a6e62', size=10),
+    margin=dict(l=40, r=20, t=40, b=40),
 )
 
 def _polar_layout():
@@ -777,17 +883,18 @@ def plot_bpm_stability(result: dict) -> go.Figure:
     fig = go.Figure()
     fig.add_hrect(y0=mean_bpm - mean_bpm * 0.015,
                   y1=mean_bpm + mean_bpm * 0.015,
-                  fillcolor='rgba(200,255,0,0.07)', line_width=0,
+                  fillcolor='rgba(201,169,110,0.08)', line_width=0,
                   annotation_text="±1.5% threshold")
     fig.add_trace(go.Scatter(
         x=x, y=bpm_time, mode='lines',
-        line=dict(color='#c8ff00', width=2),
+        line=dict(color='#c9a96e', width=2),
         name='BPM over time',
-        fill='tozeroy', fillcolor='rgba(200,255,0,0.05)'
+        fill='tozeroy', fillcolor='rgba(201,169,110,0.04)'
     ))
     fig.add_hline(y=mean_bpm, line_dash='dash', line_color='#555', line_width=1)
-    fig.update_layout(**PLOT_LAYOUT, title="BPM Stability Over Time",
-                      xaxis_title="Time (min)", yaxis_title="BPM")
+    fig.update_layout(**PLOT_BASE, title="BPM Stability Over Time")
+    fig.update_xaxes(title_text="Time (min)", gridcolor='#2a2520', zerolinecolor='#222')
+    fig.update_yaxes(title_text="BPM", gridcolor='#2a2520', zerolinecolor='#222')
     return fig
 
 
@@ -798,31 +905,24 @@ def plot_spectral_density(result: dict) -> go.Figure:
     x = np.linspace(0, result["metadata"]["duration_min"], n)
 
     fig = make_subplots(rows=2, cols=1, shared_xaxes=True, vertical_spacing=0.08)
-
-    # NOTE: add_hrect with row/col is broken in Plotly 6.
-    # Use update_layout shapes with yref='y' (row1) and yref='y2' (row2) instead.
-    fig.update_layout(
-        shapes=[
-            dict(type='rect', xref='paper', yref='y',
-                 x0=0, x1=1, y0=0.30, y1=0.45,
-                 fillcolor='rgba(200,255,0,0.07)', line_width=0, layer='below'),
-            dict(type='rect', xref='paper', yref='y2',
-                 x0=0, x1=1, y0=250, y1=400,
-                 fillcolor='rgba(255,107,0,0.07)', line_width=0, layer='below'),
-        ]
-    )
-
+    # Use shapes instead of add_hrect(row=) — broken in Plotly 6
+    fig.update_layout(shapes=[
+        dict(type='rect', xref='paper', yref='y',  x0=0, x1=1, y0=0.30, y1=0.45,
+             fillcolor='rgba(201,169,110,0.08)', line_width=0, layer='below'),
+        dict(type='rect', xref='paper', yref='y2', x0=0, x1=1, y0=250,  y1=400,
+             fillcolor='rgba(255,107,0,0.07)',    line_width=0, layer='below'),
+    ])
     fig.add_trace(go.Scatter(x=x, y=density, mode='lines',
-                              line=dict(color='#c8ff00', width=2),
-                              name='Density', fill='tozeroy', fillcolor='rgba(200,255,0,0.05)'), row=1, col=1)
+                              line=dict(color='#c9a96e', width=2),
+                              name='Density', fill='tozeroy', fillcolor='rgba(201,169,110,0.04)'), row=1, col=1)
     fig.add_trace(go.Scatter(x=x, y=centroid, mode='lines',
                               line=dict(color='#ff6b00', width=2),
                               name='Centroid (Hz)', fill='tozeroy', fillcolor='rgba(255,107,0,0.05)'), row=2, col=1)
 
-    fig.update_layout(**PLOT_LAYOUT, title="Spectral Features Over Time", height=400, showlegend=True)
-    fig.update_yaxes(title_text="Density", row=1, col=1, gridcolor='#1e1e1e')
-    fig.update_yaxes(title_text="Centroid Hz", row=2, col=1, gridcolor='#1e1e1e')
-    fig.update_xaxes(title_text="Time (min)", row=2, col=1, gridcolor='#1e1e1e')
+    fig.update_layout(**PLOT_BASE, title="Spectral Features Over Time", height=400, showlegend=True)
+    fig.update_yaxes(title_text="Density", row=1, col=1, gridcolor='#2a2520')
+    fig.update_yaxes(title_text="Centroid Hz", row=2, col=1, gridcolor='#2a2520')
+    fig.update_xaxes(title_text="Time (min)", row=2, col=1, gridcolor='#2a2520')
     return fig
 
 
@@ -842,11 +942,11 @@ def plot_sub_bass(result: dict) -> go.Figure:
         fill='tozeroy', fillcolor='rgba(0,229,160,0.05)'
     ))
     fig.update_layout(
-        **PLOT_LAYOUT,
+        **PLOT_BASE,
         title="Sub-Bass (<80 Hz) Continuity",
-        xaxis_title="Time (min)", yaxis_title="Presence",
-        yaxis=dict(range=[0, 1.05], gridcolor='#1e1e1e'),
     )
+    fig.update_xaxes(title_text="Time (min)", gridcolor='#2a2520', zerolinecolor='#222')
+    fig.update_yaxes(title_text="Presence", range=[0, 1.05], gridcolor='#2a2520', zerolinecolor='#222')
     return fig
 
 
@@ -866,16 +966,16 @@ def plot_compliance_radar(result: dict) -> go.Figure:
 
     fig = go.Figure(go.Scatterpolar(
         r=values, theta=cats, fill='toself',
-        fillcolor='rgba(200,255,0,0.10)',
-        line=dict(color='#c8ff00', width=2),
+        fillcolor='rgba(201,169,110,0.10)',
+        line=dict(color='#c9a96e', width=2),
         name='Protocol Score'
     ))
     fig.update_layout(
         **_polar_layout(),
         polar=dict(
-            bgcolor='#111111',
-            radialaxis=dict(visible=True, range=[0, 1], gridcolor='#2a2a2a', color='#666'),
-            angularaxis=dict(gridcolor='#2a2a2a', color='#888'),
+            bgcolor='#161412',
+            radialaxis=dict(visible=True, range=[0, 1], gridcolor='#2a2a2a', color='#7a6e62'),
+            angularaxis=dict(gridcolor='#2a2a2a', color='#7a6e62'),
         ),
         title="Protocol Compliance Radar",
         showlegend=False,
@@ -906,12 +1006,13 @@ def plot_corpus_scatter(result: dict) -> go.Figure:
                               mode='markers', marker=dict(color='#4488ff', size=12, symbol='cross'),
                               name='Corpus Mean'))
     fig.add_trace(go.Scatter(x=[track_density], y=[track_centroid], mode='markers',
-                              marker=dict(color='#c8ff00', size=15, symbol='star'),
+                              marker=dict(color='#c9a96e', size=15, symbol='star'),
                               name='Your Track'))
 
-    fig.update_layout(**PLOT_LAYOUT, title="Corpus Comparison: Density vs. Centroid",
-                      xaxis_title="Spectral Density", yaxis_title="Spectral Centroid (Hz)",
-                      legend=dict(bgcolor='#111'))
+    fig.update_layout(**PLOT_BASE, title="Corpus Comparison: Density vs. Centroid",
+                      legend=dict(bgcolor='#161412'))
+    fig.update_xaxes(title_text="Spectral Density", gridcolor='#2a2520', zerolinecolor='#222')
+    fig.update_yaxes(title_text="Spectral Centroid (Hz)", gridcolor='#2a2520', zerolinecolor='#222')
     return fig
 
 
@@ -945,20 +1046,19 @@ def plot_track_map(result: dict) -> go.Figure:
     # Energy envelope
     fig.add_trace(go.Scatter(
         x=t_min, y=energy, mode='lines',
-        line=dict(color='#c8ff00', width=2.5),
-        fill='tozeroy', fillcolor='rgba(200,255,0,0.07)',
+        line=dict(color='#c9a96e', width=2.5),
+        fill='tozeroy', fillcolor='rgba(201,169,110,0.08)',
         name='Energy',
         hovertemplate='%{x:.2f} min — energy %{y:.2f}<extra></extra>',
     ))
 
     fig.update_layout(
-        **PLOT_LAYOUT,
+        **PLOT_BASE,
         title='Track Structure Map — Energy Envelope & Sections',
-        xaxis_title='Time (min)',
-        yaxis_title='Normalized Energy',
-        yaxis=dict(range=[0, 1.08], gridcolor='#1a1a1a'),
         height=320, showlegend=False,
     )
+    fig.update_xaxes(title_text='Time (min)', gridcolor='#2a2520', zerolinecolor='#222')
+    fig.update_yaxes(title_text='Normalized Energy', range=[0, 1.08], gridcolor='#2a2520', zerolinecolor='#222')
     return fig
 
 
@@ -975,11 +1075,11 @@ def plot_elements_heatmap(result: dict) -> go.Figure:
         z=z_data,
         x=t_min,
         y=labels,
-        colorscale=[[0, '#0d0d0d'], [0.3, '#1a3010'], [0.7, '#5a9020'], [1, '#c8ff00']],
+        colorscale=[[0, '#0d0d0d'], [0.3, '#1a3010'], [0.7, '#5a9020'], [1, '#c9a96e']],
         showscale=True,
         colorbar=dict(
-            thickness=10, tickfont=dict(color='#666', size=9, family='Space Mono'),
-            bgcolor='#0a0a0a', outlinecolor='#222',
+            thickness=10, tickfont=dict(color='#7a6e62', size=9, family='Space Mono'),
+            bgcolor='#0f0e0d', outlinecolor='#222',
         ),
         xgap=0, ygap=2,
         hovertemplate='%{y}<br>%{x:.2f} min — presence %{z:.2f}<extra></extra>',
@@ -990,10 +1090,10 @@ def plot_elements_heatmap(result: dict) -> go.Figure:
                       line_dash='dot', line_color='#2a2a2a')
 
     fig.update_layout(
-        **{k: v for k, v in PLOT_LAYOUT.items() if k not in ('xaxis', 'yaxis')},
+        **PLOT_BASE,
         title='Element / Layer Presence Timeline',
-        xaxis=dict(title='Time (min)', gridcolor='#1a1a1a'),
-        yaxis=dict(gridcolor='#1a1a1a', tickfont=dict(size=10)),
+        xaxis=dict(title='Time (min)', gridcolor='#2a2520'),
+        yaxis=dict(gridcolor='#2a2520', tickfont=dict(size=10)),
         height=340,
         margin=dict(l=130, r=60, t=45, b=40),
     )
@@ -1009,7 +1109,7 @@ def plot_chord_timeline(result: dict) -> go.Figure:
     x_edges = [i * dur / n for i in range(n + 1)]
 
     unique_chords = list(dict.fromkeys(chord_tl))
-    palette = ['#c8ff00', '#ff6b00', '#00e5a0', '#4488ff', '#ff44aa', '#ffaa00', '#ff6666', '#aaaaaa']
+    palette = ['#c9a96e', '#ff6b00', '#00e5a0', '#4488ff', '#ff44aa', '#ffaa00', '#ff6666', '#aaaaaa']
     cmap = {c: palette[i % len(palette)] for i, c in enumerate(unique_chords)}
 
     fig = go.Figure()
@@ -1025,14 +1125,14 @@ def plot_chord_timeline(result: dict) -> go.Figure:
         )
 
     fig.update_layout(
-        **PLOT_LAYOUT,
+        **PLOT_BASE,
         title='Estimated Harmonic Progression',
-        xaxis_title='Time (min)',
-        yaxis=dict(visible=False, range=[0, 1]),
         height=110,
         showlegend=False,
         margin=dict(l=40, r=20, t=40, b=35),
     )
+    fig.update_xaxes(title_text='Time (min)', gridcolor='#2a2520', zerolinecolor='#222')
+    fig.update_yaxes(visible=False, range=[0, 1])
     return fig
 
 
@@ -1049,7 +1149,7 @@ def plot_key_circle(result: dict) -> go.Figure:
     ref = cof_minor if mode in ('minor', 'dorian', 'phrygian') else cof_major
     label_mode = 'minor keys' if mode in ('minor', 'dorian', 'phrygian') else 'major keys'
 
-    colors = ['#c8ff00' if n == key else '#1e1e1e' for n in ref]
+    colors = ['#c9a96e' if n == key else '#1e1e1e' for n in ref]
     txt_c  = ['#000'    if n == key else '#555'    for n in ref]
     sizes  = [38        if n == key else 24        for n in ref]
     theta  = [i * 30 for i in range(12)]
@@ -1067,7 +1167,7 @@ def plot_key_circle(result: dict) -> go.Figure:
     fig.update_layout(
         **_polar_layout(),
         polar=dict(
-            bgcolor='#0a0a0a',
+            bgcolor='#0f0e0d',
             radialaxis=dict(visible=False, range=[0, 1.4]),
             angularaxis=dict(visible=False),
         ),
@@ -1076,6 +1176,99 @@ def plot_key_circle(result: dict) -> go.Figure:
         height=280,
         margin=dict(l=20, r=20, t=45, b=20),
     )
+
+
+def plot_master_waveform(result: dict) -> go.Figure:
+    """Master overview chart: energy + sections + key elements overlay."""
+    tm   = result["track_map"]
+    t_min = [ti / 60 for ti in tm["time_points_sec"]]
+    energy = tm["energy_timeline"]
+    els  = tm["elements"]
+    dur  = result["metadata"]["duration_min"]
+    bpm  = result["tempo"]["bpm"]
+    N    = len(t_min)
+
+    fig = make_subplots(
+        rows=3, cols=1,
+        shared_xaxes=True,
+        vertical_spacing=0.04,
+        row_heights=[0.55, 0.25, 0.20],
+        subplot_titles=["Energy · Sections", "Element Presence", "BPM Stability"],
+    )
+
+    # ── Row 1: Energy + section bands
+    section_colors_map = {
+        'INTRO': 'rgba(130,130,120,0.14)', 'BUILD': 'rgba(201,169,110,0.14)',
+        'PEAK':  'rgba(138,173,154,0.14)', 'GROOVE':'rgba(138,154,173,0.14)',
+        'BREAKDOWN':'rgba(100,90,80,0.18)','OUTRO': 'rgba(80,80,75,0.12)',
+    }
+    for sec in tm["sections"]:
+        x0 = sec["start_sec"] / 60
+        x1 = sec["end_sec"]   / 60
+        mid = (x0 + x1) / 2
+        col = section_colors_map.get(sec["label"], "rgba(100,100,100,0.1)")
+        fig.add_shape(type="rect", xref="x", yref="y",
+                      x0=x0, x1=x1, y0=0, y1=1.05,
+                      fillcolor=col, line_width=0, layer="below", row=1, col=1)
+        fig.add_annotation(x=mid, y=1.02, text=sec["label"],
+                           showarrow=False, row=1, col=1,
+                           font=dict(size=7, color="#7a6e62", family="DM Mono"),
+                           yref="y")
+
+    fig.add_trace(go.Scatter(
+        x=t_min, y=energy, mode="lines",
+        line=dict(color="#c9a96e", width=2),
+        fill="tozeroy", fillcolor="rgba(201,169,110,0.06)",
+        name="Energy", showlegend=False,
+        hovertemplate="%{x:.2f} min · energy %{y:.2f}<extra></extra>",
+    ), row=1, col=1)
+
+    # Section vertical lines
+    for sec in tm["sections"][1:]:
+        for r in [1, 2, 3]:
+            fig.add_vline(x=sec["start_sec"]/60, line_width=1,
+                          line_dash="dot", line_color="#2a2520", row=r, col=1)
+
+    # ── Row 2: Stacked element lines (top 4 most present)
+    el_items = sorted(els.items(), key=lambda x: -x[1]["mean_presence"])[:4]
+    el_palette = ["#c9a96e", "#8aad9a", "#8a9aad", "#c49a8a"]
+    for i, (k, v) in enumerate(el_items):
+        tl_smooth = v["timeline"]
+        fig.add_trace(go.Scatter(
+            x=t_min, y=tl_smooth, mode="lines",
+            line=dict(color=el_palette[i % 4], width=1.2),
+            fill="tozeroy", fillcolor=f"rgba({['201,169,110','138,173,154','138,154,173','196,154,138'][i % 4]},0.04)",
+            name=k, showlegend=True,
+            hovertemplate=f"{k}: %{{y:.2f}}<extra></extra>",
+        ), row=2, col=1)
+
+    # ── Row 3: BPM
+    bpm_ts = result["tempo"]["bpm_over_time"]
+    x_bpm  = np.linspace(0, result["metadata"]["duration_min"], len(bpm_ts))
+    fig.add_trace(go.Scatter(
+        x=x_bpm, y=bpm_ts, mode="lines",
+        line=dict(color="#8a9aad", width=1.5),
+        name="BPM", showlegend=False,
+        hovertemplate="BPM: %{y:.1f}<extra></extra>",
+    ), row=3, col=1)
+    fig.add_hline(y=bpm, line_dash="dot", line_color="#3a3028", line_width=1, row=3, col=1)
+
+    fig.update_layout(
+        **PLOT_BASE,
+        height=520,
+        title=dict(text=f"Master Analysis · {result['metadata']['filename']} · {bpm:.1f} BPM",
+                   font=dict(size=11, color="#7a6e62")),
+        legend=dict(orientation="h", y=-0.04, x=0, font=dict(size=9, color="#7a6e62"),
+                    bgcolor="rgba(0,0,0,0)", borderwidth=0),
+        hovermode="x unified",
+    )
+    for r in [1, 2, 3]:
+        fig.update_xaxes(gridcolor="#2a2520", zerolinecolor="#2a2520", row=r, col=1)
+        fig.update_yaxes(gridcolor="#2a2520", zerolinecolor="#2a2520", row=r, col=1)
+    fig.update_xaxes(title_text="Time (min)", row=3, col=1)
+    fig.update_yaxes(title_text="Energy", row=1, col=1)
+    fig.update_yaxes(title_text="Presence", row=2, col=1)
+    fig.update_yaxes(title_text="BPM", row=3, col=1)
     return fig
 
 
@@ -1104,7 +1297,7 @@ with st.sidebar:
                                   label_visibility="collapsed")
 
     st.markdown('<div class="section-header">Export</div>', unsafe_allow_html=True)
-    export_format = st.selectbox("Format", ["JSON", "CSV", "LaTeX"], label_visibility="collapsed")
+    export_format = st.selectbox("Format", ["JSON", "CSV", "LaTeX", "HTML Report (→ PDF)"], label_visibility="collapsed")
 
     st.markdown("---")
     st.markdown('<div style="font-size:0.65rem;color:#444;font-family:Space Mono;line-height:1.6">'
@@ -1167,17 +1360,41 @@ if not uploaded:
             </div>""", unsafe_allow_html=True)
     st.stop()
 
-# ── ANALYSIS
+# ── SESSION STATE
+if "result" not in st.session_state:
+    st.session_state.result = None
+if "analyzed_name" not in st.session_state:
+    st.session_state.analyzed_name = None
+
+# ── ANALYZE BUTTON
 audio_bytes = uploaded.read()
 
-with st.spinner("Analyzing track..."):
-    result = try_real_analysis(audio_bytes, uploaded.name)
-    time.sleep(0.4)
+col_btn1, col_btn2, col_btn3 = st.columns([1, 2, 1])
+with col_btn2:
+    analyze_clicked = st.button("◆  Analyze Track", use_container_width=True)
+
+if analyze_clicked or (st.session_state.analyzed_name == uploaded.name and st.session_state.result):
+    if analyze_clicked or st.session_state.result is None:
+        with st.spinner(""):
+            result = try_real_analysis(audio_bytes, uploaded.name)
+            time.sleep(0.3)
+            st.session_state.result = result
+            st.session_state.analyzed_name = uploaded.name
+    else:
+        result = st.session_state.result
+else:
+    st.markdown('''
+    <div style="text-align:center;padding:3rem 0;color:#4a4038;font-family:'DM Mono',monospace;font-size:0.7rem;letter-spacing:0.15em">
+    TRACK LOADED · PRESS ANALYZE TO BEGIN
+    </div>''', unsafe_allow_html=True)
+    st.stop()
 
 real = result["metadata"].get("real_analysis", False)
 if not real:
-    st.info("⚠️ **Demo mode** — librosa not detected. Install `librosa` (see requirements.txt) for "
-            "real audio analysis. Results below are deterministically seeded from your filename.", icon="⚠️")
+    st.markdown('<div style="font-family:DM Mono,monospace;font-size:0.62rem;color:#4a4038;'
+                'padding:0.4rem 0.8rem;border:1px solid #2a2520;margin-bottom:0.8rem;display:inline-block">'
+                '◦ Demo mode — install librosa for real audio analysis</div>',
+                unsafe_allow_html=True)
 
 
 # ──────────────────────────────────────────────
@@ -1234,7 +1451,7 @@ with c4: st.markdown(metric_html("Centroid", f"{s_r['centroid']['mean']:.0f}", "
 with c5: st.markdown(metric_html("Sub-Bass", f"{l_r['sub_presence_pct']*100:.0f}", "%", l_r['sub_presence_pct'] >= 0.90), unsafe_allow_html=True)
 with c6: st.markdown(metric_html("Duration", f"{result['metadata']['duration_min']:.1f}", "min", result['metadata']['duration_min'] >= 6), unsafe_allow_html=True)
 with c7:
-    mode_col = MODE_COLORS.get(tn_r['mode'], '#c8ff00')
+    mode_col = MODE_COLORS.get(tn_r['mode'], '#c9a96e')
     st.markdown(f"""<div class="metric-card">
         <div class="metric-value" style="font-size:1.3rem;color:{mode_col}">{tn_r['key']} <span style="font-size:0.9rem">{tn_r['mode']}</span></div>
         <div class="metric-label">Key · {tn_r['confidence']*100:.0f}% conf</div>
@@ -1247,9 +1464,13 @@ st.markdown("&nbsp;", unsafe_allow_html=True)
 # TABS
 # ──────────────────────────────────────────────
 
+# ── MASTER WAVEFORM (always visible, above tabs)
+st.markdown('<div class="section-header">Master Analysis — Full Track View</div>', unsafe_allow_html=True)
+st.plotly_chart(plot_master_waveform(result), use_container_width=True)
+
 tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
-    "📋 Protocol", "📊 Spectral", "🎚️ Structure",
-    "🗺️ Track Map", "🎼 Tonality", "🌐 Corpus", "📄 Export"
+    "Protocol", "Spectral", "Structure",
+    "Track Map", "Tonality", "Corpus", "Export"
 ])
 
 
@@ -1435,7 +1656,7 @@ with tab5:
     with col_t1:
         # Key display
         st.markdown('<div class="section-header">Detected Key</div>', unsafe_allow_html=True)
-        mode_col = MODE_COLORS.get(tn_r['mode'], '#c8ff00')
+        mode_col = MODE_COLORS.get(tn_r['mode'], '#c9a96e')
         st.markdown(f"""
         <div style="background:#111;border:1px solid #222;border-left:4px solid {mode_col};
                     padding:1.5rem 2rem;margin-bottom:1rem">
@@ -1448,8 +1669,8 @@ with tab5:
         # Scale notes
         st.markdown('<div class="section-header">Scale Notes</div>', unsafe_allow_html=True)
         scale_html = "".join(
-            f'<span class="chord-pill" style="color:{"#c8ff00" if n == tn_r["key"] else "#888"};'
-            f'border-color:{"#c8ff00" if n == tn_r["key"] else "#222"}">{n}</span>'
+            f'<span class="chord-pill" style="color:{"#c9a96e" if n == tn_r["key"] else "#888"};'
+            f'border-color:{"#c9a96e" if n == tn_r["key"] else "#222"}">{n}</span>'
             for n in tn_r["scale_notes"]
         )
         st.markdown(scale_html, unsafe_allow_html=True)
@@ -1549,6 +1770,9 @@ with tab6:
 # ── TAB 7: EXPORT
 with tab7:
     st.markdown('<div class="section-header">Acoustic Interpretation</div>', unsafe_allow_html=True)
+    st.markdown('<div style="font-family:DM Mono,monospace;font-size:0.65rem;color:#4a4038;margin-bottom:0.5rem">'
+                'Auto-generated narrative analysis — download as annotated PDF report</div>',
+                unsafe_allow_html=True)
 
     interp_text = generate_interpretation(result)
     st.markdown(f'<div class="interp-box">{interp_text.replace(chr(10), "<br>")}</div>',
@@ -1642,15 +1866,72 @@ Principles Passed & {p_val['principles_passed']}/5 & {'\\checkmark' if p_val['co
             )
             st.code(latex, language="latex")
 
+        elif export_format == "HTML Report (→ PDF)":
+            interp = generate_interpretation(result)
+            tv, sv, lv, pv, tnv = (result["tempo"], result["spectral"],
+                                    result["lowend"], result["protocol_compliance"],
+                                    result["tonality"])
+            comp   = pv["compliant"]
+            sc     = "#8aad9a" if comp else "#c47a7a"
+            st_lbl = "PROTOCOL COMPLIANT" if comp else "NON-COMPLIANT"
+            rows = ""
+            for code, p in pv["principles"].items():
+                ok  = p["compliant"]
+                pc2 = "#8aad9a" if ok else "#c47a7a"
+                rows += f"<tr><td><b>{code}</b></td><td>{p['name']}</td><td style='color:{pc2}'><b>{'PASS' if ok else 'FAIL'}</b></td><td style='color:#7a6e62;font-size:0.8rem'>{p['details']}</td></tr>\n"
+            interp_html = interp.replace("**", "").replace("\n\n", "</p><p>").replace("\n", "<br>")
+            html_report = f"""<!DOCTYPE html><html><head><meta charset="utf-8">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=DM+Mono:wght@300;400&display=swap');
+* {{ box-sizing:border-box; margin:0; padding:0; }}
+body {{ font-family:'DM Mono',monospace; background:#faf8f5; color:#2a2218; padding:3.5rem; max-width:900px; margin:0 auto; font-size:13px; line-height:1.7; }}
+h1 {{ font-family:'Cormorant Garamond',serif; font-weight:300; font-size:2.2rem; letter-spacing:0.06em; border-bottom:1px solid #d4c8b8; padding-bottom:0.8rem; margin-bottom:1.5rem; color:#1a1410; }}
+h2 {{ font-family:'DM Mono',monospace; font-size:0.6rem; text-transform:uppercase; letter-spacing:0.2em; color:#9a8e80; border-bottom:1px solid #e8e0d4; padding-bottom:0.3rem; margin:2rem 0 1rem; }}
+.status {{ display:inline-block; padding:0.3rem 0.9rem; border:1px solid {sc}; color:{sc}; font-size:0.65rem; letter-spacing:0.2em; margin:1rem 0 1.5rem; }}
+.grid {{ display:grid; grid-template-columns:repeat(3,1fr); gap:0.8rem; margin:1.2rem 0; }}
+.card {{ border:1px solid #e0d8cc; padding:0.9rem; border-left:2px solid #c9a96e; background:#fdfbf8; }}
+.val {{ font-family:'Cormorant Garamond',serif; font-size:1.8rem; font-weight:300; color:#c9a96e; line-height:1; }}
+.lbl {{ font-size:0.55rem; letter-spacing:0.18em; text-transform:uppercase; color:#9a8e80; margin-top:0.25rem; }}
+table {{ width:100%; border-collapse:collapse; margin:1.2rem 0; }}
+th {{ font-size:0.55rem; text-transform:uppercase; letter-spacing:0.15em; color:#9a8e80; padding:0.5rem; text-align:left; border-bottom:1px solid #e0d8cc; background:#fdfbf8; }}
+td {{ padding:0.55rem; border-bottom:1px solid #ede8e0; font-size:0.82rem; }}
+.interp {{ background:#fdfbf8; border:1px solid #e0d8cc; border-left:2px solid #c9a96e; padding:1.4rem; font-size:0.82rem; line-height:1.9; color:#3a3028; }}
+.interp p {{ margin-bottom:1rem; }}
+.footer {{ font-size:0.55rem; color:#c0b8ac; margin-top:3rem; border-top:1px solid #e0d8cc; padding-top:1rem; text-transform:uppercase; letter-spacing:0.12em; }}
+@media print {{ body {{ padding:1.5rem; }} }}
+</style></head><body>
+<h1>Continuous Inertia Techno Analyzer</h1>
+<p style="font-size:0.65rem;color:#9a8e80;margin-bottom:0.5rem">{result['metadata']['filename']} · {result['metadata']['duration_min']:.1f} min · {tv['bpm']:.1f} BPM · Key: {tnv['key_string'].upper()} · Analyzer v{result['metadata']['analyzer_version']}</p>
+<div class="status">{st_lbl} — {pv['principles_passed']}/5 PRINCIPLES</div>
+<div class="grid">
+  <div class="card"><div class="val">{tv['bpm']:.1f}</div><div class="lbl">BPM</div></div>
+  <div class="card"><div class="val" style="color:{'#8aad9a' if tv['bpm_variance_pct']<1.5 else '#c47a7a'}">{tv['bpm_variance_pct']:.2f}%</div><div class="lbl">BPM Variance</div></div>
+  <div class="card"><div class="val">{sv['density']['mean']:.3f}</div><div class="lbl">Spectral Density</div></div>
+  <div class="card"><div class="val">{sv['centroid']['mean']:.0f} Hz</div><div class="lbl">Centroid</div></div>
+  <div class="card"><div class="val" style="color:{'#8aad9a' if lv['sub_presence_pct']>=0.90 else '#c47a7a'}">{lv['sub_presence_pct']*100:.0f}%</div><div class="lbl">Sub-Bass</div></div>
+  <div class="card"><div class="val">{tnv['key_string'].upper()}</div><div class="lbl">Key · {tnv['confidence']*100:.0f}% confidence</div></div>
+</div>
+<h2>Protocol Compliance</h2>
+<table><tr><th>Code</th><th>Principle</th><th>Result</th><th>Details</th></tr>{rows}</table>
+<h2>Acoustic Interpretation</h2>
+<div class="interp"><p>{interp_html}</p></div>
+<p class="footer">Generated by Continuous Inertia Techno Analyzer v{result['metadata']['analyzer_version']} · Open in browser → File → Print → Save as PDF</p>
+</body></html>"""
+            st.download_button("⬇ Download HTML Report (→ Print as PDF)",
+                               data=html_report,
+                               file_name=f"report_{Path(uploaded.name).stem}.html",
+                               mime="text/html")
+            st.info("Open the downloaded file in your browser → File → Print → Save as PDF for a clean publication-ready report.")
+
     with col_ex2:
         st.markdown('<div class="section-header">Export Formats</div>', unsafe_allow_html=True)
         st.markdown("""
-        <div style="font-size:0.82rem;line-height:2;color:#888">
-        ✓ JSON — full pipeline<br>
-        ✓ CSV — SPSS / R / Python<br>
-        ✓ LaTeX — direct paste<br>
-        ✓ TXT — interpretation<br>
-        ✓ Batch via CLI
+        <div style="font-family:DM Mono,monospace;font-size:0.68rem;line-height:2.2;color:#7a6e62">
+        JSON · full pipeline<br>
+        CSV  · SPSS / R / Python<br>
+        LaTeX · direct paste<br>
+        HTML → PDF · annotated report<br>
+        TXT  · interpretation
         </div>
         """, unsafe_allow_html=True)
 
