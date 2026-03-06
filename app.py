@@ -780,98 +780,236 @@ def generate_interpretation(result: dict) -> str:
     tn  = result["tonality"]
     el  = result["elements"]
     tm  = result["track_map"]
+    ap  = result["antipatterns"]
+    st  = result["structure"]
 
     bpm      = t["bpm"]
+    bpm_var  = t["bpm_variance_pct"]
     density  = s["density"]["mean"]
     centroid = s["centroid"]["mean"]
     sub      = l["sub_presence_pct"]
+    layers   = st["layers_mean"]
+    interval = st["mean_interval_bars"]
     passed   = p["principles_passed"]
     key_str  = tn["key_string"].upper()
     mode     = tn["mode"]
+    dur      = result["metadata"]["duration_min"]
+    principles = p["principles"]
+    is_demo  = not result["metadata"].get("real_analysis", False)
 
-    if bpm < 128:       bpm_char = "slow and meditative"
-    elif bpm <= 132:    bpm_char = "steady and hypnotic"
-    elif bpm <= 136:    bpm_char = "driving and propulsive"
-    else:               bpm_char = "aggressive and relentless"
+    if bpm < 128:    bpm_char = "slow and meditative (below typical techno range)"
+    elif bpm <= 132: bpm_char = "steady and hypnotic — optimal for trance-like states"
+    elif bpm <= 136: bpm_char = "driving and propulsive"
+    else:            bpm_char = "fast and aggressive (above recommended 135 BPM ceiling)"
 
-    if density < 0.25:  density_char = "extremely sparse and minimal"
-    elif density < 0.35:density_char = "lean and purposefully sparse"
-    elif density < 0.45:density_char = "controlled and balanced"
-    elif density < 0.55:density_char = "moderately layered"
-    else:               density_char = "dense and heavily layered"
+    if density < 0.25:   density_char = "extremely sparse — very few simultaneous sound layers"
+    elif density < 0.35: density_char = "lean and minimal — ideal for sustained listening"
+    elif density < 0.45: density_char = "controlled and balanced — within optimal range"
+    elif density < 0.55: density_char = "moderately dense — approaching saturation threshold"
+    else:                density_char = "dense and complex — likely above parsimony threshold"
 
-    mode_char = {
-        'minor': 'dark and introspective', 'dorian': 'modal and groove-oriented',
-        'phrygian': 'tense and cinematic', 'mixolydian': 'open and hypnotic',
-        'major': 'clear and driving',
-    }.get(mode, 'neutral')
+    mode_descriptions = {
+        'minor':      'Natural Minor (Aeolian) — the foundational mode of dark techno; creates introspective, melancholic tension without resolution',
+        'dorian':     'Dorian Mode — minor with a raised 6th; groove-oriented and modal, common in hypnotic techno',
+        'phrygian':   'Phrygian Mode — tense, cinematic; the flat 2nd creates strong forward momentum',
+        'mixolydian': 'Mixolydian Mode — major with a flat 7th; open and cyclic, effective for long-form DJ use',
+        'major':      'Major Scale — bright and resolved; unusual for dark techno, more common in melodic styles',
+    }
+    mode_char = mode_descriptions.get(mode, 'unidentified mode')
 
-    centroid_char = (
-        "heavily sub-weighted" if centroid < 250 else
-        "low-mid focused" if centroid < 350 else "mid-range forward"
-    )
+    if centroid < 200:   centroid_char = "extremely bass-heavy — energy is almost entirely sub-sonic"
+    elif centroid < 280: centroid_char = "sub/low-bass dominant — strong somatic (body-felt) impact"
+    elif centroid < 380: centroid_char = "low-mid focused — balanced between physical and auditory engagement"
+    else:                centroid_char = "mid-range forward — more cognitive/auditory than physical"
 
     present_els = [v['label'] for v in el.values() if v['present']]
-    peak_count  = sum(1 for sec in tm["sections"] if sec['label'] == 'PEAK')
+    absent_els  = [v['label'] for v in el.values() if not v['present']]
+    peak_secs   = [sec for sec in tm["sections"] if sec['label'] == 'PEAK']
 
-    if passed >= 5:   prot_status = "fully compliant (5/5 principles)"
-    elif passed >= 4: prot_status = f"compliant ({passed}/5 principles)"
-    elif passed >= 3: prot_status = f"partially compliant ({passed}/5) — requires revision"
-    else:             prot_status = f"non-compliant ({passed}/5) — significant deviations detected"
+    def verdict(ok):
+        return "PASS" if ok else "FAIL"
 
-    elements_str = (
-        ', '.join(present_els[:-1]) + ' and ' + present_els[-1]
-        if len(present_els) > 1 else (present_els[0] if present_els else 'undetermined')
-    )
+    p1 = principles["P1"]
+    p2 = principles["P2"]
+    p3 = principles["P3"]
+    p4 = principles["P4"]
+    p5 = principles["P5"]
 
-    sub_sentence = (
-        "delivering the sustained somatic pressure characteristic of functional floor music."
-        if sub >= 0.9 else
-        "which may reduce the sustained neurophysiological entrainment effect on the dancefloor."
-    )
+    if p1['compliant']:
+        p1_exp = f"BPM variance is {bpm_var:.2f}% — within the 1.5% threshold. This indicates a mechanically stable groove, essential for sustained trance induction."
+    else:
+        p1_exp = f"BPM variance is {bpm_var:.2f}% — exceeding the 1.5% threshold. Excessive tempo drift disrupts the listener's sense of continuous motion. Tighten the grid or use stricter quantisation."
 
-    structure_desc = (
-        f"a classic double-peak arc ({peak_count} peak sections)"
-        if peak_count >= 2 else "a single-peak linear arc"
-    )
+    if p2['compliant']:
+        p2_exp = f"Spectral density is {density:.3f} with {layers:.1f} mean layers — within the 0.30-0.45 target. Sparse layering maintains cognitive headroom and prevents listener fatigue."
+    elif density < 0.30:
+        p2_exp = f"Spectral density is {density:.3f} — below the 0.30 minimum. Too few layers creates monotony without sufficient textural interest. Add a subtle continuous element."
+    else:
+        p2_exp = f"Spectral density is {density:.3f} with {layers:.1f} layers — above the 0.45 maximum. Too many layers creates cognitive overload, breaking the trance state. Simplify or remove elements."
 
-    return f"""**Acoustic Profile — {result['metadata']['filename']}**
+    if p3['compliant']:
+        p3_exp = f"Mean change interval is {interval:.1f} bars — within the 8-16 bar target. Subtle, periodic micro-variations keep the listener's attention without disrupting inertia."
+    elif interval > 16:
+        p3_exp = f"Mean change interval is {interval:.1f} bars — too long. Changes happening too rarely create static monotony. Introduce subtle variations more frequently (every 8-16 bars)."
+    else:
+        p3_exp = f"Mean change interval is {interval:.1f} bars — too short. Changes happening too frequently feel restless and prevent the settling of a hypnotic groove."
 
-This track operates at **{bpm:.1f} BPM** with a {bpm_char} character. Written in **{key_str}** — a {mode_char} tonal framework — it positions itself within the harmonic language common to hypnotic and functional techno production.
+    if p4['compliant']:
+        p4_exp = f"Sub-bass is present {sub*100:.0f}% of the track — meeting the 90% minimum. Continuous sub-bass provides the somatic anchor that makes this music physically immersive."
+    else:
+        p4_exp = f"Sub-bass is present only {sub*100:.0f}% of the track — below the 90% minimum. Gaps in sub-bass break the physical pressure that defines this genre. The sub layer must be nearly uninterrupted."
 
-**Spectral character:** The production is {density_char} (density {density:.3f}), with spectral energy concentrated at **{centroid:.0f} Hz** — a {centroid_char} profile. {'This locates the track firmly in the low-frequency somatic domain, prioritizing physical over cognitive engagement.' if centroid < 300 else 'The forward spectral balance implies textural or melodic depth alongside rhythmic function.'}
+    if p5['compliant']:
+        p5_exp = "Textural continuity is sufficient. A continuous textural layer maintains the perceptual field that prevents abrupt transitions from sounding jarring."
+    else:
+        p5_exp = "Textural continuity is insufficient. Without a sustained texture running throughout, the track feels episodic rather than continuous. Add a low-level drone or texture that runs the full duration."
 
-**Low-end continuity:** Sub-bass presence stands at **{sub*100:.0f}%** ({'exceeding' if sub >= 0.9 else 'below'} the 90% protocol threshold), {sub_sentence}
+    ap_lines = []
+    if ap["density_overload"]:
+        ap_lines.append("  - DENSITY OVERLOAD: More than 60% spectral density means too many simultaneous elements. This is the most common mistake in productions aiming for hypnotic simplicity.")
+    if ap["sub_absent"]:
+        ap_lines.append("  - SUB-BASS ABSENT: Sub frequencies missing for more than 30% of the track. This significantly weakens somatic impact on a sound system.")
+    if ap["bpm_change"]:
+        ap_lines.append("  - BPM DRIFT: Tempo changes exceed 3% — likely caused by humanised grid or live performance artefacts. For CI Techno, BPM must be mechanically constant.")
+    ap_section = ("ANTI-PATTERNS DETECTED:\n" + "\n".join(ap_lines)) if ap_lines else "No anti-patterns detected."
 
-**Track structure:** {len(tm['sections'])} sections following {structure_desc}. The energy envelope shows {'minimal dynamic contrast, consistent with continuous inertia design philosophy' if t['bpm_variance_pct'] < 1.5 else 'notable dynamic variation across sections'}.
+    if passed == 5:
+        verdict_text = "FULLY COMPLIANT (5/5) — All five core principles are met. Suitable for floor deployment and academic corpus inclusion."
+    elif passed == 4:
+        verdict_text = "COMPLIANT (4/5) — Minimum threshold satisfied. Qualifies as Continuous Inertia Techno with minor deviations."
+    elif passed == 3:
+        verdict_text = "PARTIALLY COMPLIANT (3/5) — Two principles fail. Shows CI Techno characteristics but requires revision before corpus inclusion."
+    else:
+        verdict_text = f"NON-COMPLIANT ({passed}/5) — Three or more principles fail. Significant structural revision needed."
 
-**Detected sonic layers ({len(present_els)}):** {elements_str}.
+    failing_recs = []
+    for k in ['P1','P2','P3','P4','P5']:
+        if not principles[k]['compliant']:
+            failing_recs.append(f"  [{k} - {principles[k]['name']}] {principles[k]['details']} | Threshold: {principles[k]['threshold']}")
+    recs_text = "\n".join(failing_recs) if failing_recs else "  No changes needed — track meets all protocol requirements."
 
-**Protocol assessment:** This track is **{prot_status}**. {'It qualifies as functional Continuous Inertia Techno, designed for sustained rhythmic entrainment and reduced cognitive load under prolonged listening.' if passed >= 4 else 'Revision of the failing principles is recommended before floor deployment or protocol submission.'}"""
+    lines = [
+        "CONTINUOUS INERTIA TECHNO ANALYZER — ANALYSIS REPORT",
+        "=" * 56,
+        f"File:     {result['metadata']['filename']}",
+        f"Duration: {dur:.1f} min  |  BPM: {bpm:.1f}  |  Key: {key_str}  |  Mode: {mode.capitalize()}",
+        f"Analysis: {'Simulated demo (install librosa for real analysis)' if is_demo else 'Real audio analysis'}",
+        "",
+        "OVERALL VERDICT",
+        "-" * 40,
+        verdict_text,
+        "",
+        ap_section,
+        "",
+        "=" * 56,
+        "WHAT IS CONTINUOUS INERTIA TECHNO?",
+        "=" * 56,
+        "Continuous Inertia (CI) Techno is a production protocol for tracks that induce",
+        "sustained trance-like states through acoustic consistency. Unlike conventional",
+        "techno which uses dramatic drops and builds, CI Techno maintains near-constant",
+        "energy, sub-bass, and spectral density throughout. The goal is neurophysiological:",
+        "reducing cognitive load so listeners enter a deep, embodied listening state.",
+        "Five measurable acoustic principles define and distinguish it from other styles.",
+        "",
+        "=" * 56,
+        "P1 — TEMPORAL STABILITY",
+        "-" * 40,
+        "Target: BPM variance < 1.5%",
+        "WHY: The CI protocol targets 128-135 BPM, a range associated with physiological",
+        "entrainment (heart rate, respiration synchronisation). BPM drift above 1.5% breaks",
+        "this synchronisation and disrupts the continuous inertia state.",
+        "",
+        f"Result [{verdict(p1['compliant'])}]: {p1_exp}",
+        "",
+        "=" * 56,
+        "P2 — SPECTRAL PARSIMONY",
+        "-" * 40,
+        "Target: Density 0.30-0.45 | Max 4 simultaneous layers",
+        "WHY: Spectral density measures how full the frequency spectrum is. Below 0.30",
+        "feels empty; above 0.45 becomes cognitively tiring over extended listening.",
+        "The centroid tells you where energy lives: lower = more physical/body-felt,",
+        "higher = more auditory/melody-driven.",
+        "",
+        f"Density: {density:.3f}  |  Centroid: {centroid:.0f} Hz ({centroid_char})",
+        f"Result [{verdict(p2['compliant'])}]: {p2_exp}",
+        "",
+        "=" * 56,
+        "P3 — PERIODIC MICRO-VARIATION",
+        "-" * 40,
+        "Target: Changes every 8-16 bars",
+        "WHY: CI Techno uses micro-variation rather than macro-structure. Small changes",
+        "(adding/removing one element, filter sweeps, subtle FX) must happen regularly",
+        "enough to maintain interest without disrupting the hypnotic flow.",
+        "",
+        f"Mean interval: {interval:.1f} bars",
+        f"Result [{verdict(p3['compliant'])}]: {p3_exp}",
+        "",
+        "=" * 56,
+        "P4 — CONTINUOUS SUB-BASS",
+        "-" * 40,
+        "Target: Frequencies < 80 Hz present >= 90% of track",
+        "WHY: Continuous sub-bass (20-80 Hz) is the defining characteristic of CI Techno.",
+        "This range is felt physically through bones and organs, not just heard.",
+        "It creates the floor pressure that makes this music somatic and functional.",
+        "Any gap in the sub layer breaks the physical continuity of the experience.",
+        "",
+        f"Sub presence: {sub*100:.0f}%  |  Sub/Kick ratio: {l['sub_kick_ratio']:.2f}",
+        f"Result [{verdict(p4['compliant'])}]: {p4_exp}",
+        "",
+        "=" * 56,
+        "P5 — TEXTURAL CONTINUITY",
+        "-" * 40,
+        "Target: Texture/drone present >= 85% of track",
+        "WHY: A persistent textural layer acts as acoustic glue. Without it, even a",
+        "rhythmically consistent track can feel fragmented and episodic.",
+        "",
+        f"Result [{verdict(p5['compliant'])}]: {p5_exp}",
+        "",
+        "=" * 56,
+        "HARMONIC ANALYSIS",
+        "-" * 40,
+        f"Detected Key: {key_str}",
+        f"Mode: {mode_char}",
+        f"Estimated Chord Progression: {' - '.join(tn['chord_progression'])}",
+        f"Relative Key: {tn['relative_key'].upper()}",
+        "",
+        "WHY IT MATTERS: In CI Techno, harmony is static or moves very slowly.",
+        "Minor and Dorian modes dominate because they create tension without resolution,",
+        "supporting continuous forward motion without a sense of arrival or closure.",
+        "",
+        "=" * 56,
+        "DETECTED SONIC ELEMENTS",
+        "-" * 40,
+        f"Active ({len(present_els)}):  {', '.join(present_els) if present_els else 'none detected'}",
+        f"Absent ({len(absent_els)}):  {', '.join(absent_els) if absent_els else 'none'}",
+        "",
+        "=" * 56,
+        "PRODUCTION RECOMMENDATIONS",
+        "-" * 40,
+        recs_text,
+        "",
+        "=" * 56,
+        f"Generated by Continuous Inertia Techno Analyzer v{result['metadata']['analyzer_version']}",
+        "This report is intended for research, production review, and academic documentation.",
+    ]
+    return "\n".join(lines)
+
 
 
 # ──────────────────────────────────────────────
 # PLOTTING FUNCTIONS
 # ──────────────────────────────────────────────
 
-PLOT_LAYOUT = dict(
-    paper_bgcolor='#0f0e0d',
-    plot_bgcolor='#161412',
-    font=dict(family='DM Mono, monospace', color='#7a6e62', size=10),
-    margin=dict(l=40, r=20, t=40, b=40),
-    xaxis=dict(gridcolor='#2a2520', zerolinecolor='#2a2520'),
-    yaxis=dict(gridcolor='#2a2520', zerolinecolor='#2a2520'),
-)
+# PLOT_BASE: ONLY bgcolor + font. Never add margin/xaxis/yaxis here.
 PLOT_BASE = dict(
     paper_bgcolor='#0f0e0d',
     plot_bgcolor='#161412',
     font=dict(family='DM Mono, monospace', color='#7a6e62', size=10),
-    margin=dict(l=40, r=20, t=40, b=40),
 )
+PLOT_LAYOUT = PLOT_BASE
 
 def _polar_layout():
-    base = {k: v for k, v in PLOT_LAYOUT.items() if k not in ('xaxis', 'yaxis')}
-    return base
+    return dict(PLOT_BASE)
 
 
 def plot_bpm_stability(result: dict) -> go.Figure:
@@ -1089,12 +1227,8 @@ def plot_elements_heatmap(result: dict) -> go.Figure:
         fig.add_vline(x=sec['start_sec'] / 60, line_width=1,
                       line_dash='dot', line_color='#2a2a2a')
 
-    fig.update_layout(
-        **PLOT_BASE,
-        title='Element / Layer Presence Timeline',
-        height=340,
-        margin=dict(l=130, r=60, t=45, b=40),
-    )
+    fig.update_layout(**PLOT_BASE, title='Element / Layer Presence Timeline', height=340)
+    fig.update_layout(margin=dict(l=130, r=60, t=45, b=40))
     fig.update_xaxes(title_text='Time (min)', gridcolor='#2a2520', zerolinecolor='#2a2520')
     fig.update_yaxes(gridcolor='#2a2520', zerolinecolor='#2a2520', tickfont=dict(size=10))
     return fig
@@ -1124,13 +1258,8 @@ def plot_chord_timeline(result: dict) -> go.Figure:
             font=dict(family='Space Mono', size=10, color='#000'),
         )
 
-    fig.update_layout(
-        **PLOT_BASE,
-        title='Estimated Harmonic Progression',
-        height=110,
-        showlegend=False,
-        margin=dict(l=40, r=20, t=40, b=35),
-    )
+    fig.update_layout(**PLOT_BASE, title='Estimated Harmonic Progression', height=110, showlegend=False)
+    fig.update_layout(margin=dict(l=40, r=20, t=40, b=35))
     fig.update_xaxes(title_text='Time (min)', gridcolor='#2a2520', zerolinecolor='#222')
     fig.update_yaxes(visible=False, range=[0, 1])
     return fig
@@ -1769,16 +1898,84 @@ with tab6:
 
 # ── TAB 7: EXPORT
 with tab7:
-    st.markdown('<div class="section-header">Acoustic Interpretation</div>', unsafe_allow_html=True)
-    st.markdown('<div style="font-family:DM Mono,monospace;font-size:0.65rem;color:#4a4038;margin-bottom:0.5rem">'
-                'Auto-generated narrative analysis — download as annotated PDF report</div>',
-                unsafe_allow_html=True)
-
+    # ── PDF/TXT download button — prominent, at top
     interp_text = generate_interpretation(result)
-    st.markdown(f'<div class="interp-box">{interp_text.replace(chr(10), "<br>")}</div>',
-                unsafe_allow_html=True)
+    stem = Path(uploaded.name).stem
 
-    # Download interpretation as txt
+    # Build the HTML report for PDF
+    comp_c  = "#8aad9a" if compliant else "#c47a7a"
+    comp_lbl= "PROTOCOL COMPLIANT" if compliant else "NON-COMPLIANT"
+    p_rows  = ""
+    for code, pp in result["protocol_compliance"]["principles"].items():
+        ok  = pp["compliant"]
+        pc2 = "#8aad9a" if ok else "#c47a7a"
+        p_rows += f"<tr><td><b>{code}</b></td><td>{pp['name']}</td><td style='color:{pc2}'><b>{'PASS' if ok else 'FAIL'}</b></td><td style='color:#7a6e62'>{pp['details']}</td></tr>\n"
+
+    interp_html_body = interp_text.replace("\n", "<br>").replace("=" * 56, "<hr>").replace("-" * 40, "")
+    tv2, sv2, lv2 = result["tempo"], result["spectral"], result["lowend"]
+    tnv2 = result["tonality"]
+
+    html_report = f"""<!DOCTYPE html><html><head><meta charset="utf-8">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=DM+Mono:wght@300;400&display=swap');
+*{{box-sizing:border-box;margin:0;padding:0}}
+body{{font-family:'DM Mono',monospace;background:#faf8f5;color:#2a2218;padding:3rem;max-width:860px;margin:0 auto;font-size:12.5px;line-height:1.75}}
+h1{{font-family:'Cormorant Garamond',serif;font-weight:300;font-size:2rem;letter-spacing:.06em;border-bottom:1px solid #d4c8b8;padding-bottom:.8rem;margin-bottom:1.5rem;color:#1a1410}}
+h2{{font-family:'DM Mono',monospace;font-size:.6rem;text-transform:uppercase;letter-spacing:.2em;color:#9a8e80;border-bottom:1px solid #e8e0d4;padding-bottom:.3rem;margin:2rem 0 1rem}}
+.status{{display:inline-block;padding:.3rem .9rem;border:1px solid {comp_c};color:{comp_c};font-size:.65rem;letter-spacing:.2em;margin:.8rem 0 1.5rem}}
+.grid{{display:grid;grid-template-columns:repeat(3,1fr);gap:.7rem;margin:1.2rem 0}}
+.card{{border:1px solid #e0d8cc;padding:.8rem;border-left:2px solid #c9a96e;background:#fdfbf8}}
+.val{{font-family:'Cormorant Garamond',serif;font-size:1.7rem;font-weight:300;color:#c9a96e;line-height:1}}
+.lbl{{font-size:.55rem;letter-spacing:.18em;text-transform:uppercase;color:#9a8e80;margin-top:.2rem}}
+table{{width:100%;border-collapse:collapse;margin:1rem 0}}
+th{{font-size:.55rem;text-transform:uppercase;letter-spacing:.15em;color:#9a8e80;padding:.5rem;text-align:left;border-bottom:1px solid #e0d8cc;background:#fdfbf8}}
+td{{padding:.5rem;border-bottom:1px solid #ede8e0;font-size:.8rem}}
+.analysis{{background:#fdfbf8;border:1px solid #e0d8cc;border-left:2px solid #c9a96e;padding:1.4rem;margin-top:1rem;white-space:pre-wrap;font-size:.8rem;line-height:1.8;color:#3a3028}}
+hr{{border:none;border-top:1px solid #e0d8cc;margin:1rem 0}}
+.footer{{font-size:.55rem;color:#c0b8ac;margin-top:3rem;border-top:1px solid #e0d8cc;padding-top:1rem;text-transform:uppercase;letter-spacing:.12em}}
+@media print{{body{{padding:1.5rem}}}}
+</style></head><body>
+<h1>Continuous Inertia Techno Analyzer</h1>
+<p style="font-size:.65rem;color:#9a8e80">{result['metadata']['filename']} &nbsp;·&nbsp; {tv2['bpm']:.1f} BPM &nbsp;·&nbsp; {result['metadata']['duration_min']:.1f} min &nbsp;·&nbsp; {tnv2['key_string'].upper()}</p>
+<div class="status">{comp_lbl} &nbsp;—&nbsp; {passed}/5 PRINCIPLES</div>
+<div class="grid">
+<div class="card"><div class="val">{tv2['bpm']:.1f}</div><div class="lbl">BPM</div></div>
+<div class="card"><div class="val" style="color:{'#8aad9a' if tv2['bpm_variance_pct']<1.5 else '#c47a7a'}">{tv2['bpm_variance_pct']:.2f}%</div><div class="lbl">BPM Variance</div></div>
+<div class="card"><div class="val">{sv2['density']['mean']:.3f}</div><div class="lbl">Spectral Density</div></div>
+<div class="card"><div class="val">{sv2['centroid']['mean']:.0f} Hz</div><div class="lbl">Centroid</div></div>
+<div class="card"><div class="val" style="color:{'#8aad9a' if lv2['sub_presence_pct']>=0.90 else '#c47a7a'}">{lv2['sub_presence_pct']*100:.0f}%</div><div class="lbl">Sub-Bass</div></div>
+<div class="card"><div class="val">{tnv2['key_string'].upper()}</div><div class="lbl">Key &nbsp;·&nbsp; {tnv2['confidence']*100:.0f}% conf</div></div>
+</div>
+<h2>Protocol Compliance</h2>
+<table><tr><th>Code</th><th>Principle</th><th>Result</th><th>Details</th></tr>{p_rows}</table>
+<h2>Full Analysis with Explanations</h2>
+<div class="analysis">{interp_text}</div>
+<p class="footer">Continuous Inertia Techno Analyzer v{result['metadata']['analyzer_version']} &nbsp;·&nbsp; Open in browser → Print → Save as PDF</p>
+</body></html>"""
+
+    # ── PROMINENT download button
+    st.markdown('<div class="section-header">Download Report</div>', unsafe_allow_html=True)
+    col_dl1, col_dl2, col_dl3 = st.columns([1, 2, 1])
+    with col_dl2:
+        st.download_button(
+            label="◆  Download Analysis Report (HTML → PDF)",
+            data=html_report,
+            file_name=f"CI_Analysis_{stem}.html",
+            mime="text/html",
+            use_container_width=True,
+        )
+    st.markdown(
+        '<div style="text-align:center;font-family:DM Mono,monospace;font-size:0.6rem;'
+        'color:#4a4038;margin-top:0.3rem;margin-bottom:1.5rem">'
+        'Open the downloaded file in any browser · File → Print → Save as PDF</div>',
+        unsafe_allow_html=True
+    )
+
+    st.markdown('<div class="section-header">Acoustic Interpretation</div>', unsafe_allow_html=True)
+    st.markdown(
+        f'<div class="interp-box" style="white-space:pre-wrap;font-size:0.75rem">{interp_text}</div>',
+        unsafe_allow_html=True
+    )
     st.download_button(
         "⬇ Download Interpretation (.txt)",
         data=interp_text,
