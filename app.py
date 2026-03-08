@@ -44,15 +44,15 @@ st.markdown("""
     --s2:      #1d1a17;
     --border:  #2a2520;
     --border2: #3a3028;
-    --gold:    #c9a96e;
-    --gold2:   #e8d5b0;
+    --gold:    #d4b483;
+    --gold2:   #eedcba;
     --rose:    #c49a8a;
     --sage:    #8aad9a;
     --slate:   #8a9aad;
-    --text:    #e0d8ce;
-    --muted:   #7a6e62;
+    --text:    #ede5d8;
+    --muted:   #9a8e82;
     --dim:     #4a4038;
-    --pass:    #8aad9a;
+    --pass:    #9abdaa;
     --fail:    #c47a7a;
     --warn:    #c9a96e;
 }
@@ -130,7 +130,7 @@ hr { border: none !important; border-top: 1px solid var(--border) !important; ma
 }
 .stTabs [data-baseweb="tab"] {
     font-family: 'DM Mono', monospace !important;
-    font-size: 0.62rem !important;
+    font-size: 0.72rem !important;
     letter-spacing: 0.14em !important;
     text-transform: uppercase !important;
     color: var(--muted) !important;
@@ -156,7 +156,7 @@ hr { border: none !important; border-top: 1px solid var(--border) !important; ma
 [data-testid="stToggle"] label,
 [data-testid="stSelectbox"] label {
     font-family: 'DM Mono', monospace !important;
-    font-size: 0.62rem !important;
+    font-size: 0.72rem !important;
     letter-spacing: 0.12em !important;
     text-transform: uppercase !important;
     color: var(--muted) !important;
@@ -208,19 +208,19 @@ hr { border: none !important; border-top: 1px solid var(--border) !important; ma
 
 .metric-label {
     font-family: 'DM Mono', monospace;
-    font-size: 0.55rem;
+    font-size: 0.68rem;
     text-transform: uppercase;
     letter-spacing: 0.16em;
-    color: var(--muted);
+    color: var(--text);
     margin-top: 0.3rem;
 }
 
 .section-header {
     font-family: 'DM Mono', monospace;
-    font-size: 0.55rem;
+    font-size: 0.68rem;
     text-transform: uppercase;
     letter-spacing: 0.2em;
-    color: var(--muted);
+    color: var(--text);
     border-bottom: 1px solid var(--border);
     padding-bottom: 0.35rem;
     margin: 1.4rem 0 0.9rem 0;
@@ -238,7 +238,7 @@ hr { border: none !important; border-top: 1px solid var(--border) !important; ma
 
 .badge {
     font-family: 'DM Mono', monospace;
-    font-size: 0.55rem;
+    font-size: 0.68rem;
     padding: 0.15rem 0.45rem;
     letter-spacing: 0.1em;
     flex-shrink: 0;
@@ -271,12 +271,12 @@ hr { border: none !important; border-top: 1px solid var(--border) !important; ma
 .tag {
     display: inline-block;
     font-family: 'DM Mono', monospace;
-    font-size: 0.55rem;
+    font-size: 0.68rem;
     letter-spacing: 0.15em;
     padding: 0.1rem 0.4rem;
     background: var(--s2);
     border: 1px solid var(--border2);
-    color: var(--muted);
+    color: var(--text);
 }
 
 .chord-pill {
@@ -323,7 +323,7 @@ hr { border: none !important; border-top: 1px solid var(--border) !important; ma
 .section-chip {
     display: inline-block;
     font-family: 'DM Mono', monospace;
-    font-size: 0.55rem;
+    font-size: 0.68rem;
     padding: 0.12rem 0.45rem;
     margin: 0.1rem;
     letter-spacing: 0.08em;
@@ -362,7 +362,7 @@ SECTION_COLORS = {
     'OUTRO':     'rgba(80,80,80,0.18)',
 }
 SECTION_TEXT_COLORS = {
-    'INTRO': '#888', 'BUILD': '#ff6b00', 'PEAK': '#c9a96e',
+    'INTRO': '#888', 'BUILD': '#ff6b00', 'PEAK': '#d4b483',
     'GROOVE': '#00e5a0', 'BREAKDOWN': '#4488ff', 'OUTRO': '#666',
 }
 
@@ -407,7 +407,7 @@ MODE_COLORS = {
     'minor': '#4488ff',
     'dorian': '#00e5a0',
     'phrygian': '#ff3b3b',
-    'mixolydian': '#c9a96e',
+    'mixolydian': '#d4b483',
     'major': '#ff6b00',
 }
 
@@ -468,7 +468,7 @@ def simulate_track_structure(duration_sec, bpm):
     # ── Element timelines
     # presence per section: [INTRO, BUILD, PEAK, GROOVE, BREAKDOWN, BUILD2, PEAK2, OUTRO]
     el_defs = {
-        'Kick':     {'label': '4/4 Kick Drum',      'color': '#c9a96e',
+        'Kick':     {'label': '4/4 Kick Drum',      'color': '#d4b483',
                      'pres': [0.30, 0.92, 1.00, 1.00, 0.02, 0.92, 1.00, 0.35]},
         'Sub Bass': {'label': 'Sub Bass (<80 Hz)',   'color': '#ff6b00',
                      'pres': [0.55, 0.82, 0.96, 0.95, 0.65, 0.84, 0.96, 0.50]},
@@ -1004,7 +1004,7 @@ def generate_interpretation(result: dict) -> str:
 PLOT_BASE = dict(
     paper_bgcolor='#0f0e0d',
     plot_bgcolor='#161412',
-    font=dict(family='DM Mono, monospace', color='#7a6e62', size=10),
+    font=dict(family='DM Mono, monospace', color='#9a8e82', size=10),
 )
 PLOT_LAYOUT = PLOT_BASE
 
@@ -1021,13 +1021,13 @@ def plot_bpm_stability(result: dict) -> go.Figure:
     fig = go.Figure()
     fig.add_hrect(y0=mean_bpm - mean_bpm * 0.015,
                   y1=mean_bpm + mean_bpm * 0.015,
-                  fillcolor='rgba(201,169,110,0.08)', line_width=0,
+                  fillcolor='rgba(212,180,131,0.08)', line_width=0,
                   annotation_text="±1.5% threshold")
     fig.add_trace(go.Scatter(
         x=x, y=bpm_time, mode='lines',
-        line=dict(color='#c9a96e', width=2),
+        line=dict(color='#d4b483', width=2),
         name='BPM over time',
-        fill='tozeroy', fillcolor='rgba(201,169,110,0.04)'
+        fill='tozeroy', fillcolor='rgba(212,180,131,0.04)'
     ))
     fig.add_hline(y=mean_bpm, line_dash='dash', line_color='#555', line_width=1)
     fig.update_layout(**PLOT_BASE, title="BPM Stability Over Time")
@@ -1046,13 +1046,13 @@ def plot_spectral_density(result: dict) -> go.Figure:
     # Use shapes instead of add_hrect(row=) — broken in Plotly 6
     fig.update_layout(shapes=[
         dict(type='rect', xref='paper', yref='y',  x0=0, x1=1, y0=0.30, y1=0.45,
-             fillcolor='rgba(201,169,110,0.08)', line_width=0, layer='below'),
+             fillcolor='rgba(212,180,131,0.08)', line_width=0, layer='below'),
         dict(type='rect', xref='paper', yref='y2', x0=0, x1=1, y0=250,  y1=400,
              fillcolor='rgba(255,107,0,0.07)',    line_width=0, layer='below'),
     ])
     fig.add_trace(go.Scatter(x=x, y=density, mode='lines',
-                              line=dict(color='#c9a96e', width=2),
-                              name='Density', fill='tozeroy', fillcolor='rgba(201,169,110,0.04)'), row=1, col=1)
+                              line=dict(color='#d4b483', width=2),
+                              name='Density', fill='tozeroy', fillcolor='rgba(212,180,131,0.04)'), row=1, col=1)
     fig.add_trace(go.Scatter(x=x, y=centroid, mode='lines',
                               line=dict(color='#ff6b00', width=2),
                               name='Centroid (Hz)', fill='tozeroy', fillcolor='rgba(255,107,0,0.05)'), row=2, col=1)
@@ -1104,16 +1104,16 @@ def plot_compliance_radar(result: dict) -> go.Figure:
 
     fig = go.Figure(go.Scatterpolar(
         r=values, theta=cats, fill='toself',
-        fillcolor='rgba(201,169,110,0.10)',
-        line=dict(color='#c9a96e', width=2),
+        fillcolor='rgba(212,180,131,0.10)',
+        line=dict(color='#d4b483', width=2),
         name='Protocol Score'
     ))
     fig.update_layout(
         **_polar_layout(),
         polar=dict(
             bgcolor='#161412',
-            radialaxis=dict(visible=True, range=[0, 1], gridcolor='#2a2a2a', color='#7a6e62'),
-            angularaxis=dict(gridcolor='#2a2a2a', color='#7a6e62'),
+            radialaxis=dict(visible=True, range=[0, 1], gridcolor='#2a2a2a', color='#9a8e82'),
+            angularaxis=dict(gridcolor='#2a2a2a', color='#9a8e82'),
         ),
         title="Protocol Compliance Radar",
         showlegend=False,
@@ -1144,7 +1144,7 @@ def plot_corpus_scatter(result: dict) -> go.Figure:
                               mode='markers', marker=dict(color='#4488ff', size=12, symbol='cross'),
                               name='Corpus Mean'))
     fig.add_trace(go.Scatter(x=[track_density], y=[track_centroid], mode='markers',
-                              marker=dict(color='#c9a96e', size=15, symbol='star'),
+                              marker=dict(color='#d4b483', size=15, symbol='star'),
                               name='Your Track'))
 
     fig.update_layout(**PLOT_BASE, title="Corpus Comparison: Density vs. Centroid",
@@ -1184,8 +1184,8 @@ def plot_track_map(result: dict) -> go.Figure:
     # Energy envelope
     fig.add_trace(go.Scatter(
         x=t_min, y=energy, mode='lines',
-        line=dict(color='#c9a96e', width=2.5),
-        fill='tozeroy', fillcolor='rgba(201,169,110,0.08)',
+        line=dict(color='#d4b483', width=2.5),
+        fill='tozeroy', fillcolor='rgba(212,180,131,0.08)',
         name='Energy',
         hovertemplate='%{x:.2f} min — energy %{y:.2f}<extra></extra>',
     ))
@@ -1213,10 +1213,10 @@ def plot_elements_heatmap(result: dict) -> go.Figure:
         z=z_data,
         x=t_min,
         y=labels,
-        colorscale=[[0, '#0d0d0d'], [0.3, '#1a3010'], [0.7, '#5a9020'], [1, '#c9a96e']],
+        colorscale=[[0, '#0d0d0d'], [0.3, '#1a3010'], [0.7, '#5a9020'], [1, '#d4b483']],
         showscale=True,
         colorbar=dict(
-            thickness=10, tickfont=dict(color='#7a6e62', size=9, family='Space Mono'),
+            thickness=10, tickfont=dict(color='#9a8e82', size=9, family='Space Mono'),
             bgcolor='#0f0e0d', outlinecolor='#222',
         ),
         xgap=0, ygap=2,
@@ -1243,7 +1243,7 @@ def plot_chord_timeline(result: dict) -> go.Figure:
     x_edges = [i * dur / n for i in range(n + 1)]
 
     unique_chords = list(dict.fromkeys(chord_tl))
-    palette = ['#c9a96e', '#ff6b00', '#00e5a0', '#4488ff', '#ff44aa', '#ffaa00', '#ff6666', '#aaaaaa']
+    palette = ['#d4b483', '#ff6b00', '#00e5a0', '#4488ff', '#ff44aa', '#ffaa00', '#ff6666', '#aaaaaa']
     cmap = {c: palette[i % len(palette)] for i, c in enumerate(unique_chords)}
 
     fig = go.Figure()
@@ -1278,7 +1278,7 @@ def plot_key_circle(result: dict) -> go.Figure:
     ref = cof_minor if mode in ('minor', 'dorian', 'phrygian') else cof_major
     label_mode = 'minor keys' if mode in ('minor', 'dorian', 'phrygian') else 'major keys'
 
-    colors = ['#c9a96e' if n == key else '#1e1e1e' for n in ref]
+    colors = ['#d4b483' if n == key else '#1e1e1e' for n in ref]
     txt_c  = ['#000'    if n == key else '#555'    for n in ref]
     sizes  = [38        if n == key else 24        for n in ref]
     theta  = [i * 30 for i in range(12)]
@@ -1327,9 +1327,9 @@ def plot_master_waveform(result: dict) -> go.Figure:
 
     # ── Row 1: Energy + section bands
     section_colors_map = {
-        'INTRO': 'rgba(130,130,120,0.14)', 'BUILD': 'rgba(201,169,110,0.14)',
-        'PEAK':  'rgba(138,173,154,0.14)', 'GROOVE':'rgba(138,154,173,0.14)',
-        'BREAKDOWN':'rgba(100,90,80,0.18)','OUTRO': 'rgba(80,80,75,0.12)',
+        'INTRO': 'rgba(130,130,120,0.14)', 'BUILD': 'rgba(212,180,131,0.14)',
+        'PEAK':  'rgba(154,189,170,0.22)', 'GROOVE':'rgba(154,170,189,0.22)',
+        'BREAKDOWN':'rgba(120,108,96,0.28)','OUTRO': 'rgba(100,98,90,0.18)',
     }
     for sec in tm["sections"]:
         x0 = sec["start_sec"] / 60
@@ -1341,13 +1341,13 @@ def plot_master_waveform(result: dict) -> go.Figure:
                       fillcolor=col, line_width=0, layer="below", row=1, col=1)
         fig.add_annotation(x=mid, y=1.02, text=sec["label"],
                            showarrow=False, row=1, col=1,
-                           font=dict(size=7, color="#7a6e62", family="DM Mono"),
+                           font=dict(size=7, color="#9a8e82", family="DM Mono"),
                            yref="y")
 
     fig.add_trace(go.Scatter(
         x=t_min, y=energy, mode="lines",
-        line=dict(color="#c9a96e", width=2),
-        fill="tozeroy", fillcolor="rgba(201,169,110,0.06)",
+        line=dict(color="#d4b483", width=2),
+        fill="tozeroy", fillcolor="rgba(212,180,131,0.06)",
         name="Energy", showlegend=False,
         hovertemplate="%{x:.2f} min · energy %{y:.2f}<extra></extra>",
     ), row=1, col=1)
@@ -1360,7 +1360,7 @@ def plot_master_waveform(result: dict) -> go.Figure:
 
     # ── Row 2: Stacked element lines (top 4 most present)
     el_items = sorted(els.items(), key=lambda x: -x[1]["mean_presence"])[:4]
-    el_palette = ["#c9a96e", "#8aad9a", "#8a9aad", "#c49a8a"]
+    el_palette = ["#d4b483", "#9abdaa", "#8a9aad", "#c49a8a"]
     for i, (k, v) in enumerate(el_items):
         tl_smooth = v["timeline"]
         fig.add_trace(go.Scatter(
@@ -1386,8 +1386,8 @@ def plot_master_waveform(result: dict) -> go.Figure:
         **PLOT_BASE,
         height=520,
         title=dict(text=f"Master Analysis · {result['metadata']['filename']} · {bpm:.1f} BPM",
-                   font=dict(size=11, color="#7a6e62")),
-        legend=dict(orientation="h", y=-0.04, x=0, font=dict(size=9, color="#7a6e62"),
+                   font=dict(size=11, color="#9a8e82")),
+        legend=dict(orientation="h", y=-0.04, x=0, font=dict(size=9, color="#9a8e82"),
                     bgcolor="rgba(0,0,0,0)", borderwidth=0),
         hovermode="x unified",
     )
@@ -1500,7 +1500,7 @@ audio_bytes = uploaded.read()
 
 col_btn1, col_btn2, col_btn3 = st.columns([1, 2, 1])
 with col_btn2:
-    analyze_clicked = st.button("◆  Analyze Track", width='stretch')
+    analyze_clicked = st.button("◆  Analyze Track", use_container_width=True)
 
 if analyze_clicked or (st.session_state.analyzed_name == uploaded.name and st.session_state.result):
     if analyze_clicked or st.session_state.result is None:
@@ -1580,7 +1580,7 @@ with c4: st.markdown(metric_html("Centroid", f"{s_r['centroid']['mean']:.0f}", "
 with c5: st.markdown(metric_html("Sub-Bass", f"{l_r['sub_presence_pct']*100:.0f}", "%", l_r['sub_presence_pct'] >= 0.90), unsafe_allow_html=True)
 with c6: st.markdown(metric_html("Duration", f"{result['metadata']['duration_min']:.1f}", "min", result['metadata']['duration_min'] >= 6), unsafe_allow_html=True)
 with c7:
-    mode_col = MODE_COLORS.get(tn_r['mode'], '#c9a96e')
+    mode_col = MODE_COLORS.get(tn_r['mode'], '#d4b483')
     st.markdown(f"""<div class="metric-card">
         <div class="metric-value" style="font-size:1.3rem;color:{mode_col}">{tn_r['key']} <span style="font-size:0.9rem">{tn_r['mode']}</span></div>
         <div class="metric-label">Key · {tn_r['confidence']*100:.0f}% conf</div>
@@ -1595,7 +1595,7 @@ st.markdown("&nbsp;", unsafe_allow_html=True)
 
 # ── MASTER WAVEFORM (always visible, above tabs)
 st.markdown('<div class="section-header">Master Analysis — Full Track View</div>', unsafe_allow_html=True)
-st.plotly_chart(plot_master_waveform(result), width='stretch')
+st.plotly_chart(plot_master_waveform(result), use_container_width=True)
 
 tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
     "Protocol", "Spectral", "Structure",
@@ -1655,7 +1655,7 @@ with tab1:
             </div>""", unsafe_allow_html=True)
 
     with colb:
-        st.plotly_chart(plot_compliance_radar(result), width='stretch')
+        st.plotly_chart(plot_compliance_radar(result), use_container_width=True)
         st.markdown('<div class="section-header">Summary</div>', unsafe_allow_html=True)
         if compliant:
             st.success(f"✅ **{passed}/5 core principles met.** Track qualifies as Continuous Inertia Techno under protocol v2.1.")
@@ -1669,7 +1669,7 @@ with tab1:
 # ── TAB 2: SPECTRAL
 with tab2:
     if show_timeseries:
-        st.plotly_chart(plot_spectral_density(result), width='stretch')
+        st.plotly_chart(plot_spectral_density(result), use_container_width=True)
 
     col_s1, col_s2, col_s3 = st.columns(3)
     with col_s1:
@@ -1696,7 +1696,7 @@ with tab2:
     with col_k2: st.markdown(metric_html("Kick Consistency", f"{k_r['kick_consistency']*100:.0f}",  "%", k_r['kick_consistency'] >= 0.80), unsafe_allow_html=True)
     with col_k3: st.markdown(metric_html("Kick Fundamental", f"{k_r['kick_fundamental_hz']:.0f}",  "Hz", True), unsafe_allow_html=True)
 
-    st.plotly_chart(plot_bpm_stability(result), width='stretch')
+    st.plotly_chart(plot_bpm_stability(result), use_container_width=True)
 
 
 # ── TAB 3: STRUCTURE
@@ -1716,7 +1716,7 @@ with tab3:
 
     with col_st2:
         st.markdown('<div class="section-header">Sub-Bass Continuity</div>', unsafe_allow_html=True)
-        st.plotly_chart(plot_sub_bass(result), width='stretch')
+        st.plotly_chart(plot_sub_bass(result), use_container_width=True)
 
     col_lb1, col_lb2, col_lb3 = st.columns(3)
     with col_lb1: st.markdown(metric_html("Sub Presence",  f"{l_r['sub_presence_pct']*100:.0f}", "%", l_r['sub_presence_pct'] >= 0.90), unsafe_allow_html=True)
@@ -1727,7 +1727,7 @@ with tab3:
 # ── TAB 4: TRACK MAP  ── NEW
 with tab4:
     st.markdown('<div class="section-header">Full Track Energy Map</div>', unsafe_allow_html=True)
-    st.plotly_chart(plot_track_map(result), width='stretch')
+    st.plotly_chart(plot_track_map(result), use_container_width=True)
 
     # Section table
     st.markdown('<div class="section-header">Section Breakdown</div>', unsafe_allow_html=True)
@@ -1752,7 +1752,7 @@ with tab4:
 
     # Element heatmap
     st.markdown('<div class="section-header">Element / Layer Presence</div>', unsafe_allow_html=True)
-    st.plotly_chart(plot_elements_heatmap(result), width='stretch')
+    st.plotly_chart(plot_elements_heatmap(result), use_container_width=True)
 
     # Element summary cards
     st.markdown('<div class="section-header">Detected Elements</div>', unsafe_allow_html=True)
@@ -1785,7 +1785,7 @@ with tab5:
     with col_t1:
         # Key display
         st.markdown('<div class="section-header">Detected Key</div>', unsafe_allow_html=True)
-        mode_col = MODE_COLORS.get(tn_r['mode'], '#c9a96e')
+        mode_col = MODE_COLORS.get(tn_r['mode'], '#d4b483')
         st.markdown(f"""
         <div style="background:#111;border:1px solid #222;border-left:4px solid {mode_col};
                     padding:1.5rem 2rem;margin-bottom:1rem">
@@ -1798,8 +1798,8 @@ with tab5:
         # Scale notes
         st.markdown('<div class="section-header">Scale Notes</div>', unsafe_allow_html=True)
         scale_html = "".join(
-            f'<span class="chord-pill" style="color:{"#c9a96e" if n == tn_r["key"] else "#888"};'
-            f'border-color:{"#c9a96e" if n == tn_r["key"] else "#222"}">{n}</span>'
+            f'<span class="chord-pill" style="color:{"#d4b483" if n == tn_r["key"] else "#888"};'
+            f'border-color:{"#d4b483" if n == tn_r["key"] else "#222"}">{n}</span>'
             for n in tn_r["scale_notes"]
         )
         st.markdown(scale_html, unsafe_allow_html=True)
@@ -1817,7 +1817,7 @@ with tab5:
 
         # Chord timeline
         st.markdown('<div class="section-header" style="margin-top:1.5rem">Harmonic Timeline</div>', unsafe_allow_html=True)
-        st.plotly_chart(plot_chord_timeline(result), width='stretch')
+        st.plotly_chart(plot_chord_timeline(result), use_container_width=True)
 
         # Mode info
         mode_info = {
@@ -1835,7 +1835,7 @@ with tab5:
         </div>""", unsafe_allow_html=True)
 
     with col_t2:
-        st.plotly_chart(plot_key_circle(result), width='stretch')
+        st.plotly_chart(plot_key_circle(result), use_container_width=True)
 
         st.markdown('<div class="section-header">Key Summary</div>', unsafe_allow_html=True)
         st.markdown(f"""
@@ -1865,7 +1865,7 @@ with tab6:
     if not check_corpus:
         st.info("Enable **Corpus Comparison** in the sidebar to see this analysis.")
     else:
-        st.plotly_chart(plot_corpus_scatter(result), width='stretch')
+        st.plotly_chart(plot_corpus_scatter(result), use_container_width=True)
 
         st.markdown('<div class="section-header">Percentile Position vs. Corpus (n=30)</div>', unsafe_allow_html=True)
 
@@ -1903,12 +1903,12 @@ with tab7:
     stem = Path(uploaded.name).stem
 
     # Build the HTML report for PDF
-    comp_c  = "#8aad9a" if compliant else "#c47a7a"
+    comp_c  = "#9abdaa" if compliant else "#c47a7a"
     comp_lbl= "PROTOCOL COMPLIANT" if compliant else "NON-COMPLIANT"
     p_rows  = ""
     for code, pp in result["protocol_compliance"]["principles"].items():
         ok  = pp["compliant"]
-        pc2 = "#8aad9a" if ok else "#c47a7a"
+        pc2 = "#9abdaa" if ok else "#c47a7a"
         p_rows += f"<tr><td><b>{code}</b></td><td>{pp['name']}</td><td style='color:{pc2}'><b>{'PASS' if ok else 'FAIL'}</b></td><td style='color:#7a6e62'>{pp['details']}</td></tr>\n"
 
     interp_html_body = interp_text.replace("\n", "<br>").replace("=" * 56, "<hr>").replace("-" * 40, "")
@@ -1940,10 +1940,10 @@ hr{{border:none;border-top:1px solid #e0d8cc;margin:1rem 0}}
 <div class="status">{comp_lbl} &nbsp;—&nbsp; {passed}/5 PRINCIPLES</div>
 <div class="grid">
 <div class="card"><div class="val">{tv2['bpm']:.1f}</div><div class="lbl">BPM</div></div>
-<div class="card"><div class="val" style="color:{'#8aad9a' if tv2['bpm_variance_pct']<1.5 else '#c47a7a'}">{tv2['bpm_variance_pct']:.2f}%</div><div class="lbl">BPM Variance</div></div>
+<div class="card"><div class="val" style="color:{'#9abdaa' if tv2['bpm_variance_pct']<1.5 else '#c47a7a'}">{tv2['bpm_variance_pct']:.2f}%</div><div class="lbl">BPM Variance</div></div>
 <div class="card"><div class="val">{sv2['density']['mean']:.3f}</div><div class="lbl">Spectral Density</div></div>
 <div class="card"><div class="val">{sv2['centroid']['mean']:.0f} Hz</div><div class="lbl">Centroid</div></div>
-<div class="card"><div class="val" style="color:{'#8aad9a' if lv2['sub_presence_pct']>=0.90 else '#c47a7a'}">{lv2['sub_presence_pct']*100:.0f}%</div><div class="lbl">Sub-Bass</div></div>
+<div class="card"><div class="val" style="color:{'#9abdaa' if lv2['sub_presence_pct']>=0.90 else '#c47a7a'}">{lv2['sub_presence_pct']*100:.0f}%</div><div class="lbl">Sub-Bass</div></div>
 <div class="card"><div class="val">{tnv2['key_string'].upper()}</div><div class="lbl">Key &nbsp;·&nbsp; {tnv2['confidence']*100:.0f}% conf</div></div>
 </div>
 <h2>Protocol Compliance</h2>
@@ -2027,7 +2027,7 @@ hr{{border:none;border-top:1px solid #e0d8cc;margin:1rem 0}}
                 file_name=f"analysis_{Path(uploaded.name).stem}.csv",
                 mime="text/csv",
             )
-            st.dataframe(df.T.rename(columns={0: "Value"}), width='stretch')
+            st.dataframe(df.T.rename(columns={0: "Value"}), use_container_width=True)
 
         elif export_format == "LaTeX":
             t_val  = result["tempo"]
@@ -2074,12 +2074,12 @@ hr{{border:none;border-top:1px solid #e0d8cc;margin:1rem 0}}
                                     result["lowend"], result["protocol_compliance"],
                                     result["tonality"])
             comp   = pv["compliant"]
-            sc     = "#8aad9a" if comp else "#c47a7a"
+            sc     = "#9abdaa" if comp else "#c47a7a"
             st_lbl = "PROTOCOL COMPLIANT" if comp else "NON-COMPLIANT"
             rows = ""
             for code, p in pv["principles"].items():
                 ok  = p["compliant"]
-                pc2 = "#8aad9a" if ok else "#c47a7a"
+                pc2 = "#9abdaa" if ok else "#c47a7a"
                 rows += f"<tr><td><b>{code}</b></td><td>{p['name']}</td><td style='color:{pc2}'><b>{'PASS' if ok else 'FAIL'}</b></td><td style='color:#7a6e62;font-size:0.8rem'>{p['details']}</td></tr>\n"
             interp_html = interp.replace("**", "").replace("\n\n", "</p><p>").replace("\n", "<br>")
             html_report = f"""<!DOCTYPE html><html><head><meta charset="utf-8">
@@ -2107,10 +2107,10 @@ td {{ padding:0.55rem; border-bottom:1px solid #ede8e0; font-size:0.82rem; }}
 <div class="status">{st_lbl} — {pv['principles_passed']}/5 PRINCIPLES</div>
 <div class="grid">
   <div class="card"><div class="val">{tv['bpm']:.1f}</div><div class="lbl">BPM</div></div>
-  <div class="card"><div class="val" style="color:{'#8aad9a' if tv['bpm_variance_pct']<1.5 else '#c47a7a'}">{tv['bpm_variance_pct']:.2f}%</div><div class="lbl">BPM Variance</div></div>
+  <div class="card"><div class="val" style="color:{'#9abdaa' if tv['bpm_variance_pct']<1.5 else '#c47a7a'}">{tv['bpm_variance_pct']:.2f}%</div><div class="lbl">BPM Variance</div></div>
   <div class="card"><div class="val">{sv['density']['mean']:.3f}</div><div class="lbl">Spectral Density</div></div>
   <div class="card"><div class="val">{sv['centroid']['mean']:.0f} Hz</div><div class="lbl">Centroid</div></div>
-  <div class="card"><div class="val" style="color:{'#8aad9a' if lv['sub_presence_pct']>=0.90 else '#c47a7a'}">{lv['sub_presence_pct']*100:.0f}%</div><div class="lbl">Sub-Bass</div></div>
+  <div class="card"><div class="val" style="color:{'#9abdaa' if lv['sub_presence_pct']>=0.90 else '#c47a7a'}">{lv['sub_presence_pct']*100:.0f}%</div><div class="lbl">Sub-Bass</div></div>
   <div class="card"><div class="val">{tnv['key_string'].upper()}</div><div class="lbl">Key · {tnv['confidence']*100:.0f}% confidence</div></div>
 </div>
 <h2>Protocol Compliance</h2>
