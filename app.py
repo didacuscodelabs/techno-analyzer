@@ -1303,8 +1303,9 @@ def plot_key_circle(result: dict) -> go.Figure:
         title=f'Circle of Fifths — {label_mode}',
         showlegend=False,
         height=280,
-        margin=dict(l=20, r=20, t=45, b=20),
     )
+    fig.update_layout(margin=dict(l=20, r=20, t=45, b=20))
+    return fig
 
 
 def plot_master_waveform(result: dict) -> go.Figure:
