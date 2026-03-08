@@ -15,6 +15,16 @@ import plotly.graph_objects as go
 import plotly.express as px
 from plotly.subplots import make_subplots
 
+# ── Corpus DB (optional — works without it)
+try:
+    from db import (init_db, save_analysis, get_corpus_features,
+                    get_corpus_stats, export_for_ml, get_production_feedback,
+                    update_label, delete_track, get_all_tracks)
+    DB_AVAILABLE = True
+    init_db()
+except Exception as _db_err:
+    DB_AVAILABLE = False
+
 try:
     from scipy.ndimage import gaussian_filter1d as _gauss
     def smooth(arr, sigma=3): return _gauss(np.array(arr, dtype=float), sigma=sigma)
@@ -1510,6 +1520,15 @@ if analyze_clicked or (st.session_state.analyzed_name == uploaded.name and st.se
             time.sleep(0.3)
             st.session_state.result = result
             st.session_state.analyzed_name = uploaded.name
+
+            # ── Auto-save to corpus DB
+            if DB_AVAILABLE:
+                try:
+                    auto_label = "ci_techno" if result["protocol_compliance"]["compliant"] else "non_ci"
+                    _saved_id  = save_analysis(result, label=auto_label, label_source="auto")
+                    st.session_state["last_db_id"] = _saved_id
+                except Exception:
+                    pass
     else:
         result = st.session_state.result
 else:
@@ -1598,9 +1617,9 @@ st.markdown("&nbsp;", unsafe_allow_html=True)
 st.markdown('<div class="section-header">Master Analysis — Full Track View</div>', unsafe_allow_html=True)
 st.plotly_chart(plot_master_waveform(result), use_container_width=True)
 
-tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
+tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs([
     "Protocol", "Spectral", "Structure",
-    "Track Map", "Tonality", "Corpus", "Export"
+    "Track Map", "Tonality", "Corpus", "Production", "Export"
 ])
 
 
@@ -1897,8 +1916,152 @@ with tab6:
             st.warning(f"⚠️ Outlier features vs corpus: **{', '.join(outliers)}**. Review these parameters.")
 
 
-# ── TAB 7: EXPORT
+
+# ── TAB 7: PRODUCTION FEEDBACK
 with tab7:
+    st.markdown('<div class="section-header">Production Feedback</div>', unsafe_allow_html=True)
+
+    _pcomp = result["protocol_compliance"]
+    _prins = _pcomp["principles"]
+    _compl = _pcomp["compliant"]
+    _npassed = _pcomp["principles_passed"]
+
+    # Status banner
+    if _compl:
+        st.markdown('<div style="border:1px solid #9abdaa;padding:0.7rem 1rem;'
+                    'font-family:DM Mono,monospace;font-size:0.72rem;color:#9abdaa;margin-bottom:1rem">'
+                    '\u2713 COMPLIANT \u2014 No critical fixes required.</div>',
+                    unsafe_allow_html=True)
+    else:
+        _nf = 5 - _npassed
+        st.markdown(f'<div style="border:1px solid #d48a8a;padding:0.7rem 1rem;'
+                    f'font-family:DM Mono,monospace;font-size:0.72rem;color:#d48a8a;margin-bottom:1rem">'
+                    f'\u2717 NON-COMPLIANT \u2014 {_nf} principle{"s" if _nf>1 else ""} failing. '
+                    f'Fix HIGH items first, re-export, re-analyze.</div>',
+                    unsafe_allow_html=True)
+
+    st.markdown('<div class="section-header">Principle Diagnosis</div>', unsafe_allow_html=True)
+
+    _pfix = {
+        "P1": ("BPM variance within tolerance. Grid is mechanically stable.",
+               "Tighten quantization. Ableton: Cmd+A MIDI \u2192 Cmd+U. Audio: warp markers at each bar. "
+               "Zero humanization for CI Techno.",
+               "Edit \u2192 Record Quantization \u2192 1/16. No tempo automation."),
+        "P2": ("Spectral density and layer count within parsimony range.",
+               "Mute one bus at a time, re-analyze. CI target: kick + sub + one texture + sparse percussion. "
+               "If density >0.45 remove or attenuate loudest mid element.",
+               "Solo each group bus. Energy concentrated below 500Hz. Sparse mid/high only."),
+        "P3": ("Micro-variation interval within 8-16 bar window.",
+               "One subtle change per 8 bars. Too frequent: delete redundant automation. "
+               "Too rare: add filter sweeps at 8-bar intervals.",
+               "View arrangement with bar ruler. Each automation point at least 8 bars apart."),
+        "P4": ("Sub-bass continuity meets the 90% threshold.",
+               "Sub disappears in >10% of track. Fix: (1) reduce sidechain ratio to max 4:1, "
+               "(2) add parallel sub path bypassing sidechain, (3) sub stays active in breakdowns at lower level.",
+               "Spectrum analyzer on master: 20-80Hz never fully cuts. Breakdown: lower kick, not sub."),
+        "P5": ("Textural continuity sufficient throughout.",
+               "Add: vinyl noise, filtered white noise, or slow pad at -24 to -18 dBFS. "
+               "Full track duration. Never automate to zero.",
+               "Create TEXTURE bus. Lock fader. Never mute. Even in breakdown it stays, just lower."),
+    }
+
+    for _code, _pp in _prins.items():
+        _ok  = _pp["compliant"]
+        _col = "#9abdaa" if _ok else "#d48a8a"
+        _bdg = "PASS" if _ok else "FAIL"
+        _bg  = "#111a11" if _ok else "#1a1111"
+        _bdr = "#2a3a2a" if _ok else "#3a2a2a"
+        _msg_pass, _msg_fail, _daw = _pfix[_code]
+        _msg = _msg_pass if _ok else _msg_fail
+        _det = _pp.get("details", "")
+        st.markdown(
+            f'<div style="border:1px solid {_bdr};background:{_bg};'
+            f'padding:1rem 1.2rem;margin-bottom:0.6rem;border-left:3px solid {_col}">'
+            f'<div style="display:flex;justify-content:space-between;margin-bottom:0.5rem">'
+            f'<div><span style="font-family:DM Mono,monospace;font-size:0.65rem;color:{_col}">{_bdg}</span>'
+            f'<span style="font-family:Cormorant Garamond,serif;font-size:1.1rem;font-weight:300;'
+            f'color:#ede5d8;margin-left:0.8rem">{_pp["name"]}</span></div>'
+            f'<span style="font-family:DM Mono,monospace;font-size:0.62rem;color:#6a5e52">{_det}</span></div>'
+            f'<div style="font-family:DM Mono,monospace;font-size:0.72rem;color:#b0a890;line-height:1.7;'
+            f'margin-bottom:0.4rem">{_msg}</div>'
+            f'<div style="font-family:DM Mono,monospace;font-size:0.65rem;color:#6a5e52;'
+            f'border-top:1px solid #2a2520;padding-top:0.4rem">DAW \u2192 {_daw}</div></div>',
+            unsafe_allow_html=True)
+
+    _ap = result["antipatterns"]
+    if any(_ap.values()):
+        st.markdown('<div class="section-header">Anti-Pattern Warnings</div>', unsafe_allow_html=True)
+        _apdata = {
+            "density_overload": ("Density Overload >0.60",
+                "Spectral density exceeds 0.60. Identify loudest mid-range element, cut 6dB or remove. Re-analyze."),
+            "sub_absent": ("Sub-Bass Absent",
+                "Sub frequencies missing >30% of track. Sub layer must stay present. Lower level, never cut."),
+            "bpm_change": ("BPM Drift >3%",
+                "Tempo instability >3%. Fixed BPM only. Remove all tempo automation. Machine clock."),
+        }
+        for _k, (_lbl, _desc) in _apdata.items():
+            if _ap.get(_k):
+                st.markdown(
+                    f'<div style="border:1px solid #5a3a1a;background:#1a1008;'
+                    f'padding:0.8rem 1.2rem;margin-bottom:0.5rem;border-left:3px solid #d4b483">'
+                    f'<div style="font-family:DM Mono,monospace;font-size:0.68rem;'
+                    f'color:#d4b483;margin-bottom:0.3rem">\u26a0 {_lbl}</div>'
+                    f'<div style="font-family:DM Mono,monospace;font-size:0.70rem;'
+                    f'color:#b0a890;line-height:1.7">{_desc}</div></div>',
+                    unsafe_allow_html=True)
+
+    if DB_AVAILABLE:
+        _fb_items = get_production_feedback(result)
+        if _fb_items:
+            st.markdown('<div class="section-header">Corpus-Relative Feedback</div>', unsafe_allow_html=True)
+            for _fb in _fb_items:
+                _pc = "#d48a8a" if _fb["priority"] == "HIGH" else "#d4b483"
+                st.markdown(
+                    f'<div style="border:1px solid #2a2520;padding:0.8rem 1.2rem;'
+                    f'margin-bottom:0.5rem;border-left:3px solid {_pc}">'
+                    f'<div style="display:flex;gap:1rem;margin-bottom:0.3rem">'
+                    f'<span style="font-family:DM Mono,monospace;font-size:0.62rem;color:{_pc}">{_fb["priority"]}</span>'
+                    f'<span style="font-family:DM Mono,monospace;font-size:0.68rem;color:#ede5d8">{_fb["issue"]}</span></div>'
+                    f'<div style="font-family:DM Mono,monospace;font-size:0.62rem;color:#6a5e52;margin-bottom:0.4rem">'
+                    f'Track: {_fb["value"]} | Target: {_fb["target"]} | Corpus avg: {_fb["corpus_mean"]}</div>'
+                    f'<div style="font-family:DM Mono,monospace;font-size:0.70rem;'
+                    f'color:#b0a890;line-height:1.7">{_fb["action"]}</div></div>',
+                    unsafe_allow_html=True)
+
+        st.markdown('<div class="section-header">Corpus History</div>', unsafe_allow_html=True)
+        try:
+            _hist = get_all_tracks()
+            if _hist:
+                import pandas as _pd2
+                _dfh = _pd2.DataFrame([{
+                    "File":     r["filename"],
+                    "BPM":      f'{r["bpm"]:.1f}',
+                    "Density":  f'{r["density_mean"]:.3f}',
+                    "Centroid": f'{r["centroid_mean"]:.0f}Hz',
+                    "Sub":      f'{r["sub_presence"]*100:.0f}%',
+                    "P/F":      f'{r["principles_passed"]}/5',
+                    "Label":    r["label"],
+                    "Date":     r["analyzed_at"][:10],
+                } for r in _hist])
+                st.dataframe(_dfh, use_container_width=True, height=220)
+                _csv2 = export_for_ml().to_csv(index=False)
+                st.download_button(
+                    "\u25c6 Export Corpus CSV (ML-ready)",
+                    data=_csv2,
+                    file_name="ci_techno_corpus.csv",
+                    mime="text/csv",
+                )
+            else:
+                st.markdown(
+                    '<div style="font-family:DM Mono,monospace;font-size:0.68rem;color:#6a5e52">'
+                    'No tracks in corpus yet. Each analysis is auto-saved here.</div>',
+                    unsafe_allow_html=True)
+        except Exception:
+            pass
+
+
+# ── TAB 8: EXPORT
+with tab8:
     # ── PDF/TXT download button — prominent, at top
     interp_text = generate_interpretation(result)
     stem = Path(uploaded.name).stem
